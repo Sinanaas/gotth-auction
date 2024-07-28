@@ -15,13 +15,13 @@ func DeserializeUser() gin.HandlerFunc {
 		var access_token string
 		cookie, err := ctx.Cookie("access_token")
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "error", "message": "Unauthorized"})
+			ctx.Redirect(http.StatusSeeOther, "/login")
 			return
 		}
 
 		access_token = cookie
 		if access_token == "" {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "error", "message": "Unauthorized"})
+			ctx.Redirect(http.StatusSeeOther, "/login")
 			return
 		}
 
@@ -29,14 +29,14 @@ func DeserializeUser() gin.HandlerFunc {
 		sub, err := utils.ValidateToken(access_token, config.AccessTokenPublicKey)
 
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "Aerror", "message": err.Error()})
+			ctx.Redirect(http.StatusSeeOther, "/login")
 			return
 		}
 
 		var user models.User
 		result := initializers.DB.First(&user, "id = ?", fmt.Sprint(sub))
 		if result.Error != nil {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "error", "message": "Unauthorized"})
+			ctx.Redirect(http.StatusSeeOther, "/login")
 			return
 		}
 

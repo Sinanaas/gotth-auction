@@ -9,6 +9,7 @@ import (
 	"github.com/Sinanaas/gotth-auction/initializers"
 	"github.com/Sinanaas/gotth-auction/models"
 	"github.com/Sinanaas/gotth-auction/utils"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -63,6 +64,18 @@ func (ac AuthController) Login(ctx *gin.Context) {
 	ctx.SetCookie("access_token", accessToken, config.AccessTokenMaxAge*60, "/", "localhost", false, true)
 	ctx.SetCookie("refresh_token", refreshToken, config.RefreshTokenMaxAge*60, "/", "localhost", false, true)
 	ctx.SetCookie("logged_in", "true", config.AccessTokenMaxAge*60, "/", "localhost", false, false)
+
+	// sesssion
+	session := sessions.Default(ctx)
+	var user_id string
+	v := session.Get("user_id")
+	if v == nil {
+		user_id = user.ID.String()
+	} else {
+		user_id = v.(string)
+	}
+	session.Set("user_id", user_id)
+	session.Save()
 
 	// Handle redirection
 	ctx.Header("HX-Redirect", "/")
@@ -152,5 +165,9 @@ func (ac *AuthController) LogoutUser(ctx *gin.Context) {
 	ctx.SetCookie("refresh_token", "", -1, "/", "localhost", false, true)
 	ctx.SetCookie("logged_in", "", -1, "/", "localhost", false, false)
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
+	session := sessions.Default(ctx)
+	session.Clear()
+
+	ctx.Header("HX-Redirect", "/login")
+	ctx.Status(http.StatusOK)
 }

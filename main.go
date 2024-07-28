@@ -7,6 +7,8 @@ import (
 	"github.com/Sinanaas/gotth-auction/initializers"
 	"github.com/Sinanaas/gotth-auction/routes"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,6 +33,8 @@ func init() {
 	BasicRouteController = routes.NewBasicRouterController(BasicController)
 
 	server = gin.Default()
+	store := cookie.NewStore([]byte(config.SessionSecretKey))
+	server.Use(sessions.Sessions("mysession", store))
 }
 
 func main() {

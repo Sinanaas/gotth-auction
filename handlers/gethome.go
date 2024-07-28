@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Sinanaas/gotth-auction/templates"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,8 +15,15 @@ func NewGetHomeHandler() *GetHomeHandler {
 }
 
 func (gh *GetHomeHandler) ServeHTTP(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+	var user_id string
+	v := session.Get("user_id")
+	if v != nil {
+		user_id = v.(string)
+	}
+
 	c := templates.Home()
-	err := templates.Layout(c, "My Website").Render(ctx.Request.Context(), ctx.Writer)
+	err := templates.Layout(c, user_id).Render(ctx.Request.Context(), ctx.Writer)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
