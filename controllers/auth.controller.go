@@ -21,67 +21,70 @@ func NewAuthController(DB *gorm.DB) AuthController {
 	return AuthController{DB}
 }
 
-// login user
 func (ac AuthController) Login(ctx *gin.Context) {
-	payload := &models.SignInInput{}
+	var payload models.SignInInput
 
-	payload.Email = ctx.PostForm("email")
-	payload.Password = ctx.PostForm("password")
+	if err := ctx.ShouldBind(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid input: " + err.Error()})
+		return
+	}
 
 	var user models.User
 	result := ac.DB.Where("email = ?", payload.Email).First(&user)
 	if result.Error != nil {
-		fmt.Println("SATU")
 		ctx.JSON(http.StatusUnauthorized, gin.H{"status": "error", "message": "Invalid email or password"})
 		return
 	}
 
 	if err := utils.VerifyPassword(user.Password, payload.Password); err != nil {
-		fmt.Println("DUA")
 		ctx.JSON(http.StatusUnauthorized, gin.H{"status": "error", "message": "Invalid email or password"})
 		return
 	}
 
-	config, _ := initializers.LoadConfig(".")
-
-	access_token, err := utils.CreateToken(config.AccessTokenExpiresIn, user.ID.String(), config.AccessTokenPrivateKey)
+	config, err := initializers.LoadConfig(".")
 	if err != nil {
-		fmt.Println("TIGA")
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Configuration error"})
+		return
+	}
+
+	accessToken, err := utils.CreateToken(config.AccessTokenExpiresIn, user.ID.String(), config.AccessTokenPrivateKey)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
 		return
 	}
 
-	refresh_token, err := utils.CreateToken(config.RefreshTokenExpiresIn, user.ID.String(), config.RefreshTokenPrivateKey)
+	refreshToken, err := utils.CreateToken(config.RefreshTokenExpiresIn, user.ID.String(), config.RefreshTokenPrivateKey)
 	if err != nil {
-		fmt.Println("EMPAT")
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
 		return
 	}
-	ctx.SetCookie("access_token", access_token, config.AccessTokenMaxAge*60, "/", "localhost", false, true)
-	ctx.SetCookie("refresh_token", refresh_token, config.RefreshTokenMaxAge*60, "/", "localhost", false, true)
+
+	// Set cookies with appropriate flags
+	ctx.SetCookie("access_token", accessToken, config.AccessTokenMaxAge*60, "/", "localhost", false, true)
+	ctx.SetCookie("refresh_token", refreshToken, config.RefreshTokenMaxAge*60, "/", "localhost", false, true)
 	ctx.SetCookie("logged_in", "true", config.AccessTokenMaxAge*60, "/", "localhost", false, false)
-	fmt.Println("LIMA")
-	ctx.Header("HX-Redirect", "/register")
+
+	// Handle redirection
+	ctx.Header("HX-Redirect", "/")
 	ctx.Status(http.StatusOK)
 }
 
-// sign up user
 func (ac AuthController) SignUp(ctx *gin.Context) {
-	payload := &models.SignUpInput{}
+	var payload models.SignUpInput
 
-	payload.Email = ctx.PostForm("email")
-	payload.Password = ctx.PostForm("password")
+	if err := ctx.ShouldBind(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid input: " + err.Error()})
+		return
+	}
 
-	var user models.User
-	found := ac.DB.Where("email = ?", payload.Email).First(&user)
-	if found.Error != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"status": "error", "message": "Email already taken"})
+	if payload.Password != payload.ConfirmPassword {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Passwords do not match"})
 		return
 	}
 
 	hashedPassword, err := utils.HashPassword(payload.Password)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": "Error hashing password: " + err.Error()})
 		return
 	}
 
@@ -89,6 +92,7 @@ func (ac AuthController) SignUp(ctx *gin.Context) {
 	newUser := models.User{
 		Email:     strings.ToLower(payload.Email),
 		Password:  hashedPassword,
+		Username:  payload.Username,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
@@ -96,12 +100,16 @@ func (ac AuthController) SignUp(ctx *gin.Context) {
 	result := ac.DB.Create(&newUser)
 
 	if result.Error != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": result.Error.Error()})
+		if strings.Contains(result.Error.Error(), "duplicate key value violates unique constraint") {
+			ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "User with that email already exists"})
+		} else {
+			ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": "Something went wrong: " + result.Error.Error()})
+		}
 		return
 	}
+
 	// ctx.JSON(http.StatusCreated, gin.H{"status": "success", "message": "User created successfully"})
 	ctx.Header("HX-Redirect", "/login")
-	ctx.Status(http.StatusCreated)
 }
 
 func (ac *AuthController) RefreshToken(ctx *gin.Context) {

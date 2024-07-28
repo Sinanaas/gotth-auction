@@ -1,0 +1,73 @@
+package templates
+
+templ Login(title string) {
+	<div hx-ext="response-targets" class="mt-[-12vh]">
+		<form
+			hx-post="/login"
+			hx-trigger="submit"
+			hx-target-401="#login-error"
+			class="flex flex-col w-[300px] bg-slate-100 p-4 pb-5 rounded-lg shadow-md gap-4"
+			id="form"
+		>
+			<div class="flex justify-center items-center border-b border-slate-300 pb-4">
+				<h1 class="text-xl font-bold text-slate-700">
+					Sign In
+				</h1>
+			</div>
+			<div id="login-error"></div>
+			<div class="flex flex-col gap-1">
+				<label for="Email" class="text-slate-600 font-semibold">Email</label>
+				<input
+					type="email"
+					name="Email"
+					id="email"
+					placeholder="name@company.com"
+					required=""
+					autocomplete="email"
+					class="rounded p-1"
+					onKeyup="this.setCustomValidity('')"
+					hx-on:htmx:validation:validate="
+					if(this.value == '') {
+						this.setCustomValidity('Please enter your email address')
+						htmx.find('#form').reportValidity()
+					} 
+					if(!this.validity.valid) {
+						this.setCustomValidity('Please enter a valid email address')
+						htmx.find('#form').reportValidity()
+					}"
+				/>
+			</div>
+			<div class="flex flex-col gap-1">
+				<label for="Password" class="text-slate-600 font-semibold">Password</label>
+				<input
+					type="password"
+					name="Password"
+					id="password"
+					placeholder="••••••••"
+					required=""
+					autocomplete="current-password"
+					class="rounded p-1"
+					onKeyup="this.setCustomValidity('')"
+					hx-on:htmx:validation:validate="
+					if(this.value == '') {
+						this.setCustomValidity('Please enter your password')
+						htmx.find('#form').reportValidity()
+					}"
+				/>
+			</div>
+			<button type="submit" class="bg-amber-400 text-white rounded p-1 font-semibold">
+				Sign in
+			</button>
+			<div class="flex justify-center">
+				<p class="font-thin text-slate-600 text-sm">
+					Don’t have an account yet?
+					<a href="/register" class="text-amber-600 underline">Register</a>
+				</p>
+			</div>
+		</form>
+	</div>
+}
+
+templ LoginError() {
+	<p>Invalid email or password</p>
+}

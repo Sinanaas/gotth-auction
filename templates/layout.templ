@@ -1,0 +1,51 @@
+package templates
+
+templ header(title string) {
+	<head >
+		<title>{ title }</title>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" name="referrer" content="strict-origin-when-cross-origin"/>
+		<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
+		<script src="https://cdn.tailwindcss.com"></script>
+	</head>
+}
+
+templ footer() {
+	<footer class="p-4 "></footer>
+}
+
+templ nav() {
+	<nav class="container top-0 bg-primary-600 p-4 w-full fixed">
+		<div class="flex justify-between text-slate-800 text-xl underline font-normal">
+			<ol class="flex space-x-5">
+				<li>
+					<a class="" href="/">Homssse</a>
+				</li>
+				<li>
+					<a class="" href="/about">About</a>
+				</li>
+			</ol>
+			<ol class="flex space-x-5">
+				<li>
+					<a class="" href="/register">Register</a>
+				</li>
+				<li>
+					<a class="" href="/login">Login</a>
+				</li>
+			</ol>
+		</div>
+	</nav>
+}
+
+templ Layout(contents templ.Component, title string) {
+	@header(title)
+	<body class="flex flex-col items-center h-full w-full bg-amber-400">
+		<div class="flex w-full container items-center justify-center flex-col">
+			@nav()
+			<main class="flex-1 min-h-[95vh] justify-center items-center flex container ">
+				@contents
+			</main>
+			// @footer()
+		</div>
+	</body>
+}

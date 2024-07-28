@@ -1,9 +1,10 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/Sinanaas/gotth-auction/controllers"
+	"github.com/Sinanaas/gotth-auction/handlers"
 	"github.com/Sinanaas/gotth-auction/middleware"
+	"github.com/gin-gonic/gin"
 )
 
 type AuthRouterController struct {
@@ -15,9 +16,9 @@ func NewAuthRouterController(authController controllers.AuthController) AuthRout
 }
 
 func (ac *AuthRouterController) AuthRoute(rg *gin.RouterGroup) {
-	// rg.GET("/login", handlers.NewGetLoginHandler().ServeHTTP)
-	// rg.POST("/login", handlers.NewPostLoginHandler().ServeHTTP)
-	// rg.GET("/register", handlers.NewGetRegisterHandler().ServeHTTP)
-	// rg.POST("/register", handlers.NewPostRegisterHandler().ServeHTTP)
+	rg.GET("/login", handlers.NewGetLoginHandler().ServeHTTP)
+	rg.POST("/login", handlers.NewPostLoginHandler().ServeHTTP)
+	rg.GET("/register", handlers.NewGetRegisterHandler().ServeHTTP)
+	rg.POST("/register", handlers.NewPostRegisterHandler().ServeHTTP)
 	rg.GET("/logout", middleware.DeserializeUser(), ac.authController.LogoutUser)
 }

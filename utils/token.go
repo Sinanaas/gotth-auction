@@ -8,46 +8,54 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+// CreateToken creates a JWT token
 func CreateToken(ttl time.Duration, payload interface{}, privateKey string) (string, error) {
 	decodedPrivateKey, err := base64.StdEncoding.DecodeString(privateKey)
-
 	if err != nil {
 		return "", fmt.Errorf("could not decode key: %v", err)
 	}
 
 	key, err := jwt.ParseRSAPrivateKeyFromPEM(decodedPrivateKey)
-
 	if err != nil {
 		return "", fmt.Errorf("create: parse key: %v", err)
 	}
 
 	now := time.Now().UTC()
 
-	claims := make(jwt.MapClaims)
-	claims["sub"] = payload
-	claims["exp"] = now.Add(ttl).Unix()
-	claims["iat"] = now.Unix()
-	claims["nbf"] = now.Unix()
+	claims := jwt.MapClaims{
+		"sub": payload,
+		"exp": now.Add(ttl).Unix(),
+		"iat": now.Unix(),
+		"nbf": now.Unix(),
+	}
 
+	// Create a new token
 	token, err := jwt.NewWithClaims(jwt.SigningMethodRS256, claims).SignedString(key)
-
 	if err != nil {
-		return "", fmt.Errorf("create: sign token: %v", err)
+		return "", fmt.Errorf("create: sign token: %w", err)
 	}
 
 	return token, nil
 }
 
+// ValidateToken validates a JWT token
 func ValidateToken(token string, publicKey string) (interface{}, error) {
 	decodedPublicKey, err := base64.StdEncoding.DecodeString(publicKey)
 	if err != nil {
-		return nil, fmt.Errorf("could not decode key: %v", err)
+		return nil, fmt.Errorf("could not decode key: %w", err)
 	}
-	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+
+	key, err := jwt.ParseRSAPublicKeyFromPEM(decodedPublicKey)
+	fmt.Println("key", key)
+	if err != nil {
+		return nil, fmt.Errorf("validate: parse key: %w", err)
+	}
+
+	parsedToken, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("unexpected method: %s", t.Header["alg"])
 		}
-		return jwt.ParseRSAPublicKeyFromPEM(decodedPublicKey)
+		return key, nil
 	})
 
 	if err != nil {
@@ -58,6 +66,5 @@ func ValidateToken(token string, publicKey string) (interface{}, error) {
 	if !ok || !parsedToken.Valid {
 		return nil, fmt.Errorf("validate: invalid token")
 	}
-
 	return claims["sub"], nil
 }

@@ -7,29 +7,31 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id,omitempty"`
-	Username  string    `gorm:"type:varchar(100);unique_index" json:"username,omitempty"`
-	Password  string    `gorm:"type:varchar(100)" json:"password,omitempty"`
-	Email     string    `gorm:"type:varchar(100);unique_index" json:"email,omitempty"`
+	ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
+	Username  string    `gorm:"type:varchar(100);unique_index"`
+	Password  string    `gorm:"type:varchar(100)"`
+	Email     string    `gorm:"type:varchar(100);unique_index"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
 type SignUpInput struct {
-	Email           string `json:"email" binding:"required"`
-	Password        string `json:"password" binding:"required,min=8"`
-	ConfirmPassword string `json:"confirm_password" binding:"required,eqfield=Password"`
+	Email           string
+	Username		string
+	Password        string 
+	ConfirmPassword string 
 }
 
 type SignInInput struct {
-	Email    string `json:"email"  binding:"required"`
-	Password string `json:"password"  binding:"required"`
+	Email    string 
+	Password string 
 }
 
 type UserResponse struct {
-	ID        uuid.UUID `json:"id,omitempty"`
-	Email     string    `json:"email,omitempty"`
-	Provider  string    `json:"provider"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        uuid.UUID 
+	Email     string    
+	Username  string    
+	Provider  string    
+	CreatedAt time.Time 
+	UpdatedAt time.Time
 }
