@@ -26,7 +26,7 @@ func header() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<head><title>GOTTH AUCTION</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" name=\"referrer\" content=\"strict-origin-when-cross-origin\"><script src=\"https://unpkg.com/htmx.org@1.9.12\" integrity=\"sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2\" crossorigin=\"anonymous\"></script><script src=\"https://cdn.tailwindcss.com\"></script><link rel=\"stylesheet\" href=\"/static/app.css\"><script src=\"/static/toast.js\" defer></script></head>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<head><title>GOTTH AUCTION</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" name=\"referrer\" content=\"strict-origin-when-cross-origin\"><script src=\"https://unpkg.com/htmx.org@1.9.12\" integrity=\"sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2\" crossorigin=\"anonymous\"></script><script src=\"https://cdn.tailwindcss.com\"></script><link rel=\"stylesheet\" href=\"/static/app.css\"><script src=\"/static/toast.js\" defer></script><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\"><link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@500&amp;display=swap\" rel=\"stylesheet\"></head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -78,22 +78,22 @@ func nav(user_id string) templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"container top-0 bg-primary-600 p-4 w-full fixed\"><div class=\"flex justify-between text-slate-800 text-xl underline font-normal\"><ol class=\"flex space-x-5\"><li><a class=\"\" href=\"/\">Homssse</a></li><li><a class=\"\" href=\"/about\">About</a></li></ol><ol class=\"flex space-x-5\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"container top-0 bg-primary-600 p-4 w-full fixed font-mono\"><div class=\"flex justify-between text-slate-800 text-xl underline font-normal\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if user_id == "" {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a class=\"\" href=\"/register\">Register</a></li><li><a class=\"\" href=\"/login\">Login</a></li>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<ol class=\"flex space-x-5\"></ol><ol class=\"flex space-x-5\"><li><a class=\"\" href=\"/register\">Register</a></li><li><a class=\"\" href=\"/login\">Login</a></li></ol>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a class=\"\" href=\"/profile\">Profile</a></li><li><a class=\"cursor-pointer\" hx-get=\"/logout\">Logout</a></li>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<ol class=\"flex space-x-5\"><li><a class=\"\" href=\"/\">Homssse</a></li><li><a class=\"\" href=\"/about\">About</a></li></ol><ol class=\"flex space-x-5\"><li><a class=\"\" href=\"/profile\">Profile</a></li><li><a class=\"cursor-pointer\" hx-get=\"/logout\">Logout</a></li></ol>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ol></div></nav>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></nav>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -123,7 +123,7 @@ func Layout(contents templ.Component, user_id string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body class=\"flex flex-col items-center h-full w-full bg-amber-400\"><div class=\"flex w-full container items-center justify-center flex-col\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body class=\"flex flex-col items-center h-full w-full bg-amber-400 font-mono\"><div class=\"flex w-full container items-center justify-center flex-col\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

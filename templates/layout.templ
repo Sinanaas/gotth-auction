@@ -9,6 +9,8 @@ templ header() {
 		<script src="https://cdn.tailwindcss.com"></script>
 		<link rel="stylesheet" href="/static/app.css"/>
 		<script src="/static/toast.js" defer></script>
+		<link rel="preconnect" href="https://fonts.gstatic.com"/>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet"/>
 	</head>
 }
 
@@ -17,40 +19,43 @@ templ footer() {
 }
 
 templ nav(user_id string) {
-	<nav class="container top-0 bg-primary-600 p-4 w-full fixed">
+	<nav class="container top-0 bg-primary-600 p-4 w-full fixed font-mono">
 		<div class="flex justify-between text-slate-800 text-xl underline font-normal">
-			<ol class="flex space-x-5">
-				<li>
-					<a class="" href="/">Homssse</a>
-				</li>
-				<li>
-					<a class="" href="/about">About</a>
-				</li>
-			</ol>
-			<ol class="flex space-x-5">
-				if user_id == "" {
+			if user_id == "" {
+				<ol class="flex space-x-5"></ol>
+				<ol class="flex space-x-5">
 					<li>
 						<a class="" href="/register">Register</a>
 					</li>
 					<li>
 						<a class="" href="/login">Login</a>
 					</li>
-				} else {
+				</ol>
+			} else {
+				<ol class="flex space-x-5">
+					<li>
+						<a class="" href="/">Homssse</a>
+					</li>
+					<li>
+						<a class="" href="/about">About</a>
+					</li>
+				</ol>
+				<ol class="flex space-x-5">
 					<li>
 						<a class="" href="/profile">Profile</a>
 					</li>
 					<li>
 						<a class="cursor-pointer" hx-get="/logout">Logout</a>
 					</li>
-				}
-			</ol>
+				</ol>
+			}
 		</div>
 	</nav>
 }
 
 templ Layout(contents templ.Component, user_id string) {
 	@header()
-	<body class="flex flex-col items-center h-full w-full bg-amber-400">
+	<body class="flex flex-col items-center h-full w-full bg-amber-400 font-mono">
 		<div class="flex w-full container items-center justify-center flex-col">
 			@nav(user_id)
 			<main class="flex-1 min-h-[95vh] justify-center items-center flex container ">

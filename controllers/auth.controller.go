@@ -92,19 +92,16 @@ func (ac AuthController) Login(ctx *gin.Context) {
 	ctx.SetCookie("refresh_token", refreshToken, config.RefreshTokenMaxAge*60, "/", "localhost", false, true)
 	ctx.SetCookie("logged_in", "true", config.AccessTokenMaxAge*60, "/", "localhost", false, false)
 
-	// sesssion
+	// session
 	session := sessions.Default(ctx)
-	var user_id string
-	v := session.Get("user_id")
-	if v == nil {
-		user_id = user.ID.String()
-	} else {
-		user_id = v.(string)
+	session.Set("user_id", user.ID.String())
+	if err := session.Save(); err != nil {
+		toast := toast.Danger("Failed to save session")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to save session"})
+		return
 	}
-	session.Set("user_id", user_id)
-	session.Save()
 
-	
 	// Handle redirection
 	ctx.Header("HX-Redirect", "/")
 	ctx.Status(http.StatusOK)
@@ -142,7 +139,7 @@ func (ac AuthController) SignUp(ctx *gin.Context) {
 		ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "User with that email already exists"})
 		return
 	}
-	
+
 	result = ac.DB.Where("username = ?", payload.Username).First(&user)
 	if result.Error == nil {
 		toast := toast.Danger("User with that username already exists")

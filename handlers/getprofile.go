@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/Sinanaas/gotth-auction/controllers"
 	"github.com/Sinanaas/gotth-auction/initializers"
 	"github.com/Sinanaas/gotth-auction/templates"
@@ -21,6 +23,7 @@ func (gph GetProfileHandler) ServeHTTP(ctx *gin.Context) {
 	if v != nil {
 		user_id = v.(string)
 	}
+	fmt.Println("user_id: ", user_id)
 
 	c := templates.Profile(controllers.NewBasicController(initializers.DB).GetUser(user_id))
 	err := templates.Layout(c, user_id).Render(ctx.Request.Context(), ctx.Writer)
