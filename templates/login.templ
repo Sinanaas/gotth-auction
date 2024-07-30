@@ -6,6 +6,7 @@ templ Login(title string) {
 			hx-post="/login"
 			hx-trigger="submit"
 			hx-target-401="#login-error"
+			hx-swap="outerHTML"
 			class="flex flex-col w-[300px] bg-slate-100 p-4 pb-5 rounded-lg shadow-md gap-4"
 			id="form"
 		>
@@ -22,19 +23,9 @@ templ Login(title string) {
 					name="Email"
 					id="email"
 					placeholder="name@company.com"
-					required=""
 					autocomplete="email"
 					class="rounded p-1"
-					onKeyup="this.setCustomValidity('')"
-					hx-on:htmx:validation:validate="
-					if(this.value == '') {
-						this.setCustomValidity('Please enter your email address')
-						htmx.find('#form').reportValidity()
-					} 
-					if(!this.validity.valid) {
-						this.setCustomValidity('Please enter a valid email address')
-						htmx.find('#form').reportValidity()
-					}"
+
 				/>
 			</div>
 			<div class="flex flex-col gap-1">
@@ -44,15 +35,8 @@ templ Login(title string) {
 					name="Password"
 					id="password"
 					placeholder="••••••••"
-					required=""
 					autocomplete="current-password"
 					class="rounded p-1"
-					onKeyup="this.setCustomValidity('')"
-					hx-on:htmx:validation:validate="
-					if(this.value == '') {
-						this.setCustomValidity('Please enter your password')
-						htmx.find('#form').reportValidity()
-					}"
 				/>
 			</div>
 			<button type="submit" class="bg-amber-400 text-white rounded p-1 font-semibold">

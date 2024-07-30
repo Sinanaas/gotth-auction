@@ -17,5 +17,6 @@ func NewBasicRouterController(basicController controllers.BasicController) Basic
 
 func (bc *BasicRouterController) BasicRoute(rg *gin.RouterGroup) {
 	rg.GET("/", middleware.DeserializeUser(), handlers.NewGetHomeHandler().ServeHTTP)
-	// rg.GET("/", handlers.NewGetHomeHandler().ServeHTTP)
+	rg.GET("/about", handlers.NewGetAboutHandler().ServeHTTP)
+	rg.GET("/profile", middleware.DeserializeUser(), handlers.NewGetProfileHandler().ServeHTTP)
 }

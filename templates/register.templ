@@ -22,19 +22,8 @@ templ Register(title string) {
 					name="Email"
 					id="email"
 					placeholder="name@company.com"
-					required=""
 					autocomplete="email"
 					class="rounded p-1"
-					onKeyup="this.setCustomValidity('')"
-					hx-on:htmx:validation:validate="
-					if(this.value == '') {
-						this.setCustomValidity('Please enter your email address')
-						htmx.find('#form').reportValidity()
-					} 
-					if(!this.validity.valid) {
-						this.setCustomValidity('Please enter a valid email address')
-						htmx.find('#form').reportValidity()
-					}"
 				/>
 			</div>
 			<div class="flex flex-col gap-1">
@@ -44,14 +33,7 @@ templ Register(title string) {
 					name="Username"
 					id="username"
 					placeholder="username"
-					required=""
 					class="rounded p-1"
-					onKeyup="this.setCustomValidity('')"
-					hx-on:htmx:validation:validate="
-					if(this.value == '') {
-						this.setCustomValidity('Please enter your username')
-						htmx.find('#form').reportValidity()
-					}"
 				/>
 			</div>
 			<div class="flex flex-col gap-1">
@@ -61,15 +43,8 @@ templ Register(title string) {
 					name="Password"
 					id="password"
 					placeholder="••••••••"
-					required=""
 					autocomplete="current-password"
 					class="rounded p-1"
-					onKeyup="this.setCustomValidity('')"
-					hx-on:htmx:validation:validate="
-					if(this.value == '') {
-						this.setCustomValidity('Please enter your password')
-						htmx.find('#form').reportValidity()
-					}"
 				/>
 			</div>
 			<div class="flex flex-col gap-1">
@@ -79,19 +54,8 @@ templ Register(title string) {
 					name="ConfirmPassword"
 					id="confirm-password"
 					placeholder="••••••••"
-					required=""
 					autocomplete="current-password"
 					class="rounded p-1"
-					onKeyup="this.setCustomValidity('')"
-					hx-on:htmx:validation:validate="
-					if(this.value == '') {
-						this.setCustomValidity('Please enter your password')
-						htmx.find('#form').reportValidity()
-					}
-					if (this.value !== htmx.find('#password').value) {
-						this.setCustomValidity('Passwords do not match')
-						htmx.find('#form').reportValidity()
-					}"
 				/>
 			</div>
 			<button type="submit" class="bg-amber-400 text-white rounded p-1 font-semibold">

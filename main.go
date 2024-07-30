@@ -49,6 +49,9 @@ func main() {
 	corsConfig.AllowOrigins = []string{"http://localhost:8000", config.ClientOrigin}
 	corsConfig.AllowCredentials = true
 
+	// serve static file
+	server.Static("/static", "./static")
+
 	server.Use(cors.New(corsConfig))
 
 	router := server.Group("/")

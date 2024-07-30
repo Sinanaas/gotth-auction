@@ -3,11 +3,13 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/Sinanaas/gotth-auction/initializers"
 	"github.com/Sinanaas/gotth-auction/models"
+	"github.com/Sinanaas/gotth-auction/toast"
 	"github.com/Sinanaas/gotth-auction/utils"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -26,36 +28,61 @@ func (ac AuthController) Login(ctx *gin.Context) {
 	var payload models.SignInInput
 
 	if err := ctx.ShouldBind(&payload); err != nil {
+		toast := toast.Danger("Invalid input: " + err.Error())
+		toast.SetHXTriggerHeader(ctx)
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid input: " + err.Error()})
+		return
+	}
+
+	if payload.Email == "" || payload.Password == "" {
+		toast := toast.Danger("Email and password are required")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Email and password are required"})
+		return
+	}
+
+	if !validateEmail(payload.Email) {
+		toast := toast.Danger("Invalid email address")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid email address"})
 		return
 	}
 
 	var user models.User
 	result := ac.DB.Where("email = ?", payload.Email).First(&user)
 	if result.Error != nil {
+		toast := toast.Danger("Invalid email or password")
+		toast.SetHXTriggerHeader(ctx)
 		ctx.JSON(http.StatusUnauthorized, gin.H{"status": "error", "message": "Invalid email or password"})
 		return
 	}
 
 	if err := utils.VerifyPassword(user.Password, payload.Password); err != nil {
+		toast := toast.Danger("Invalid email or password")
+		toast.SetHXTriggerHeader(ctx)
 		ctx.JSON(http.StatusUnauthorized, gin.H{"status": "error", "message": "Invalid email or password"})
 		return
 	}
 
 	config, err := initializers.LoadConfig(".")
 	if err != nil {
+		toast := toast.Danger("Configuration error")
+		toast.SetHXTriggerHeader(ctx)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Configuration error"})
-		return
 	}
 
 	accessToken, err := utils.CreateToken(config.AccessTokenExpiresIn, user.ID.String(), config.AccessTokenPrivateKey)
 	if err != nil {
+		toast := toast.Danger(err.Error())
+		toast.SetHXTriggerHeader(ctx)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
 		return
 	}
 
 	refreshToken, err := utils.CreateToken(config.RefreshTokenExpiresIn, user.ID.String(), config.RefreshTokenPrivateKey)
 	if err != nil {
+		toast := toast.Danger(err.Error())
+		toast.SetHXTriggerHeader(ctx)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
 		return
 	}
@@ -77,6 +104,7 @@ func (ac AuthController) Login(ctx *gin.Context) {
 	session.Set("user_id", user_id)
 	session.Save()
 
+	
 	// Handle redirection
 	ctx.Header("HX-Redirect", "/")
 	ctx.Status(http.StatusOK)
@@ -86,17 +114,82 @@ func (ac AuthController) SignUp(ctx *gin.Context) {
 	var payload models.SignUpInput
 
 	if err := ctx.ShouldBind(&payload); err != nil {
+		toast := toast.Danger("Invalid input: " + err.Error())
+		toast.SetHXTriggerHeader(ctx)
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid input: " + err.Error()})
 		return
 	}
 
+	if payload.Email == "" || payload.Password == "" || payload.Username == "" {
+		toast := toast.Danger("Email, username and password are required")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Email, username and password are required"})
+		return
+	}
+
+	if !validateEmail(payload.Email) {
+		toast := toast.Danger("Invalid email address")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid email address"})
+		return
+	}
+
+	var user models.User
+	result := ac.DB.Where("email = ?", payload.Email).First(&user)
+	if result.Error == nil {
+		toast := toast.Danger("User with that email already exists")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "User with that email already exists"})
+		return
+	}
+	
+	result = ac.DB.Where("username = ?", payload.Username).First(&user)
+	if result.Error == nil {
+		toast := toast.Danger("User with that username already exists")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "User with that username already exists"})
+		return
+	}
+
+	if len(payload.Password) < 6 {
+		toast := toast.Danger("Password must be at least 6 characters long")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Password must be at least 6 characters long"})
+		return
+	}
+
+	if len(payload.Username) < 3 {
+		toast := toast.Danger("Username must be at least 3 characters long")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Username must be at least 3 characters long"})
+		return
+	}
+
+	if len(payload.Username) > 20 {
+		toast := toast.Danger("Username must be at most 20 characters long")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Username must be at most 20 characters long"})
+		return
+	}
+
+	if len(payload.Password) > 20 {
+		toast := toast.Danger("Password must be at most 20 characters long")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Password must be at most 20 characters long"})
+		return
+	}
+
 	if payload.Password != payload.ConfirmPassword {
+		toast := toast.Danger("Passwords do not match")
+		toast.SetHXTriggerHeader(ctx)
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Passwords do not match"})
 		return
 	}
 
 	hashedPassword, err := utils.HashPassword(payload.Password)
 	if err != nil {
+		toast := toast.Danger("Error hashing password: " + err.Error())
+		toast.SetHXTriggerHeader(ctx)
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": "Error hashing password: " + err.Error()})
 		return
 	}
@@ -110,12 +203,15 @@ func (ac AuthController) SignUp(ctx *gin.Context) {
 		UpdatedAt: now,
 	}
 
-	result := ac.DB.Create(&newUser)
-
+	result = ac.DB.Create(&newUser)
 	if result.Error != nil {
 		if strings.Contains(result.Error.Error(), "duplicate key value violates unique constraint") {
+			toast := toast.Danger("User with that email already exists")
+			toast.SetHXTriggerHeader(ctx)
 			ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "User with that email already exists"})
 		} else {
+			toast := toast.Danger("Something went wrong: " + result.Error.Error())
+			toast.SetHXTriggerHeader(ctx)
 			ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": "Something went wrong: " + result.Error.Error()})
 		}
 		return
@@ -170,4 +266,9 @@ func (ac *AuthController) LogoutUser(ctx *gin.Context) {
 
 	ctx.Header("HX-Redirect", "/login")
 	ctx.Status(http.StatusOK)
+}
+
+func validateEmail(email string) bool {
+	Re := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	return Re.MatchString(email)
 }

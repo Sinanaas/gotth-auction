@@ -1,0 +1,11 @@
+package templates
+
+import "github.com/Sinanaas/gotth-auction/models"
+
+templ Profile(user models.User) {
+    <div class="profile">
+        <h1>{user.Username}</h1>
+        <p>{user.Email}</p>
+        <p>{user.Password}</p>
+    </div>
+}

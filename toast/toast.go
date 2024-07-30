@@ -1,0 +1,57 @@
+package toast
+
+import (
+	"encoding/json"
+	"fmt"
+
+	"github.com/gin-gonic/gin"
+)
+
+const (
+	INFO    = "info"
+	SUCCESS = "success"
+	WARNING = "warning"
+	DANGER  = "danger"
+)
+
+type Toast struct {
+	Level   string `json:"level"`
+	Message string `json:"message"`
+}
+
+func New(level string, message string) Toast {
+	return Toast{level, message}
+}
+
+func Info(message string) Toast {
+	return New(INFO, message)
+}
+
+func Success(ctx *gin.Context, message string) {
+	New(SUCCESS, message).SetHXTriggerHeader(ctx)
+}
+
+func Danger(message string) Toast {
+	return New(DANGER, message)
+}
+
+func (t Toast) Error() string {
+	return fmt.Sprintf("%s", t.Message)
+}
+
+func (t Toast) jsonify() (string, error) {
+	t.Message = t.Error()
+	eventMap := map[string]Toast{}
+	eventMap["makeToast"] = t
+	jsonData, err := json.Marshal(eventMap)
+	if err != nil {
+		return "", err
+	}
+
+	return string(jsonData), nil
+}
+
+func (t Toast) SetHXTriggerHeader(ctx *gin.Context) {
+	jsonData, _ := t.jsonify()
+	ctx.Writer.Header().Set("HX-Trigger", jsonData)
+}

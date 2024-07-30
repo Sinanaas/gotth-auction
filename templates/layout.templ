@@ -1,12 +1,14 @@
 package templates
 
 templ header() {
-	<head >
+	<head>
 		<title>GOTTH AUCTION</title>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" name="referrer" content="strict-origin-when-cross-origin"/>
 		<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 		<script src="https://cdn.tailwindcss.com"></script>
+		<link rel="stylesheet" href="/static/app.css"/>
+		<script src="/static/toast.js" defer></script>
 	</head>
 }
 
@@ -54,7 +56,20 @@ templ Layout(contents templ.Component, user_id string) {
 			<main class="flex-1 min-h-[95vh] justify-center items-center flex container ">
 				@contents
 			</main>
-			// @footer()
+			<section id="toast-container"></section>
 		</div>
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+				document.querySelectorAll("[data-dismiss-target]").forEach(function(button) {
+					button.addEventListener("click", function() {
+						var targetId = this.getAttribute("data-dismiss-target");
+						var targetElement = document.querySelector(targetId);
+						if (targetElement) {
+							targetElement.remove();
+						}
+					});
+				});
+			});
+		</script>
 	</body>
 }
