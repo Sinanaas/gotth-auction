@@ -19,4 +19,5 @@ func (bc *BasicRouterController) BasicRoute(rg *gin.RouterGroup) {
 	rg.GET("/", middleware.DeserializeUser(), handlers.NewGetHomeHandler().ServeHTTP)
 	rg.GET("/about", middleware.DeserializeUser(), handlers.NewGetAboutHandler().ServeHTTP)
 	rg.GET("/profile", middleware.DeserializeUser(), handlers.NewGetProfileHandler().ServeHTTP)
+	rg.POST("/update-profile", middleware.DeserializeUser(), handlers.NewPostProfileHandler().ServeHTTP)
 }

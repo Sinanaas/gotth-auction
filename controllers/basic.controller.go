@@ -1,7 +1,14 @@
 package controllers
 
 import (
+	"net/http"
+
+	"github.com/Sinanaas/gotth-auction/initializers"
 	"github.com/Sinanaas/gotth-auction/models"
+	"github.com/Sinanaas/gotth-auction/toast"
+	"github.com/Sinanaas/gotth-auction/utils"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -20,4 +27,87 @@ func (bc BasicController) GetUser(userId string) models.User {
 		return models.User{}
 	}
 	return user
+}
+
+func (bc BasicController) UpdateProfile(ctx *gin.Context) {
+	// session
+	session := sessions.Default(ctx)
+	var dummy models.EditUserInput
+	userID := session.Get("user_id")
+	if userID == nil {
+		toast := toast.Danger("Unauthorized")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	var user models.User
+	if err := bc.DB.Where("id = ?", userID).First(&user).Error; err != nil {
+		toast := toast.Danger("User not found")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Bind form data to user model
+	if err := ctx.ShouldBind(&dummy); err != nil {
+		toast := toast.Danger("Invalid input")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	// Check if the username or email already exists
+	var existingUser models.User
+	if err := bc.DB.Where("username = ? OR email = ?", dummy.Username, dummy.Email).First(&existingUser).Error; err == nil && existingUser.ID != user.ID {
+		toast := toast.Danger("Username or email already exists")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusConflict, gin.H{"error": "Username or email already exists"})
+		return
+	}
+
+	if dummy.Username == "" {
+		dummy.Username = user.Username
+	}
+
+	if dummy.Email == "" {
+		dummy.Email = user.Email
+	}
+
+	if dummy.Username == user.Username && dummy.Email == user.Email {
+		toast := toast.Danger("No changes detected")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusOK, gin.H{"message": "No changes detected"})
+		return
+	} 
+
+	// Handle file upload
+	file, err := ctx.FormFile("profile_image")
+	if err == nil {
+		fileURL, err := utils.SaveFile(ctx, file, userID.(string), initializers.DB)
+		if err != nil {
+			toast := toast.Danger("Failed to upload file")
+			toast.SetHXTriggerHeader(ctx)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload file"})
+			return
+		}
+		dummy.PhotoURL = fileURL
+	} else {
+		dummy.PhotoURL = user.PhotoURL // Retain the current photo URL if no new photo is uploaded
+	}
+
+	// Update the user's profile
+	if err := bc.DB.Model(&user).Where("id = ?", userID).Updates(map[string]interface{}{
+		"username":  dummy.Username,
+		"email":     dummy.Email,
+		"photo_url": dummy.PhotoURL,
+	}).Error; err != nil {
+		toast := toast.Danger("Failed to update profile")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update profile"})
+		return
+	}
+
+	toast := toast.Success("Profile updated successfully")
+	toast.SetHXTriggerHeader(ctx)
 }

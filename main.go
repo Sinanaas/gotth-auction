@@ -13,11 +13,11 @@ import (
 )
 
 var (
-	server              *gin.Engine
-	AuthController      controllers.AuthController
-	AuthRouteController routes.AuthRouterController
+	server               *gin.Engine
+	AuthController       controllers.AuthController
+	AuthRouteController  routes.AuthRouterController
 	BasicRouteController routes.BasicRouterController
-	BasicController	 controllers.BasicController
+	BasicController      controllers.BasicController
 )
 
 func init() {
@@ -51,6 +51,7 @@ func main() {
 
 	// serve static file
 	server.Static("/static", "./static")
+	server.Static("/uploads", "./uploads")
 
 	server.Use(cors.New(corsConfig))
 

@@ -11,6 +11,7 @@ type User struct {
 	Username  string    `gorm:"type:varchar(100);unique_index"`
 	Password  string    `gorm:"type:varchar(100)"`
 	Email     string    `gorm:"type:varchar(100);unique_index"`
+	PhotoURL  string    `gorm:"type:varchar(255)"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -20,6 +21,12 @@ type SignUpInput struct {
 	Username		string
 	Password        string 
 	ConfirmPassword string 
+}
+
+type EditUserInput struct {
+	Username string
+	Email    string
+	PhotoURL string
 }
 
 type SignInInput struct {
@@ -35,3 +42,4 @@ type UserResponse struct {
 	CreatedAt time.Time 
 	UpdatedAt time.Time
 }
+

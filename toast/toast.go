@@ -27,8 +27,8 @@ func Info(message string) Toast {
 	return New(INFO, message)
 }
 
-func Success(ctx *gin.Context, message string) {
-	New(SUCCESS, message).SetHXTriggerHeader(ctx)
+func Success(message string) Toast { 
+	return New(SUCCESS, message)
 }
 
 func Danger(message string) Toast {
