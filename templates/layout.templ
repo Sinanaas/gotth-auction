@@ -23,34 +23,35 @@ templ nav(user_id string) {
 			if user_id == "" {
 				<ol class="flex space-x-5"></ol>
 				<ol class="flex space-x-5">
-					<li>
-						<a class="" href="/register">Register</a>
+					<li class="transform transition-transform ease-in delay-[10ms] hover:translate-y-1" >
+						<a href="/register">Register</a>
 					</li>
-					<li>
-						<a class="" href="/login">Login</a>
+					<li class="transform transition-transform ease-in delay-[10ms] hover:translate-y-1" >
+						<a href="/login">Login</a>
 					</li>
 				</ol>
 			} else {
 				<ol class="flex space-x-5">
-					<li>
-						<a class="" href="/">Homssse</a>
+					<li class="transform transition-transform ease-in delay-[10ms] hover:translate-y-1">
+						<a href="/">Home</a>
 					</li>
-					<li>
-						<a class="" href="/about">About</a>
+					<li  class="transform transition-transform ease-in delay-[10ms] hover:translate-y-1">
+						<a href="/about">About</a>
 					</li>
 				</ol>
 				<ol class="flex space-x-5">
-					<li>
-						<a class="" href="/profile">Profile</a>
+					<li class="transform transition-transform ease-in delay-[10ms] hover:translate-y-1">
+						<a href="/profile">Profile</a>
 					</li>
-					<li>
-						<a class="cursor-pointer" hx-get="/logout">Logout</a>
+					<li class="cursor-pointer transform transition-transform ease-in delay-[10ms] hover:translate-y-1">
+						<a hx-get="/logout">Logout</a>
 					</li>
 				</ol>
 			}
 		</div>
 	</nav>
 }
+
 
 templ Layout(contents templ.Component, user_id string) {
     @header()
@@ -74,6 +75,8 @@ templ Layout(contents templ.Component, user_id string) {
                     });
                 });
             });
+			// const socket = new WebSocket('ws://localhost:8000/ws');
+
         </script>
     </body>
 	<script src="/static/toast.js" defer></script>

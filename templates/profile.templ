@@ -6,7 +6,7 @@ templ Profile(user models.User) {
 	<div class="max-w-6xl h-80 mx-auto p-12 bg-white shadow-lg rounded-lg border border-gray-200">
 		<form hx-post="/update-profile" hx-swap="none" hx-target="#profile-container" enctype="multipart/form-data" class="flex gap-16 items-center justify-center h-full">
 			<div class="text-center flex justify-center items-center flex-col h-full">
-				<img src={"/uploads/" + user.PhotoURL} alt={ user.PhotoURL } class="w-40 h-40 outline outline-offset-[-3px] outline-gray-300  rounded-full mb-6"/>
+				<img src={"/uploads/" + user.PhotoURL} class="object-cover w-40 h-40 outline outline-offset-[-3px] outline-gray-300  rounded-full mb-6"/>
 				<div class="flex justify-center pl-4">
 					<input type="file" name="profile_image" accept="image/*" class="block w-32 text-sm text-slate-500 file file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100"/>
 				</div>

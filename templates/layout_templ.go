@@ -83,12 +83,12 @@ func nav(user_id string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if user_id == "" {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<ol class=\"flex space-x-5\"></ol><ol class=\"flex space-x-5\"><li><a class=\"\" href=\"/register\">Register</a></li><li><a class=\"\" href=\"/login\">Login</a></li></ol>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<ol class=\"flex space-x-5\"></ol><ol class=\"flex space-x-5\"><li class=\"transform transition-transform ease-in delay-[10ms] hover:translate-y-1\"><a href=\"/register\">Register</a></li><li class=\"transform transition-transform ease-in delay-[10ms] hover:translate-y-1\"><a href=\"/login\">Login</a></li></ol>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<ol class=\"flex space-x-5\"><li><a class=\"\" href=\"/\">Homssse</a></li><li><a class=\"\" href=\"/about\">About</a></li></ol><ol class=\"flex space-x-5\"><li><a class=\"\" href=\"/profile\">Profile</a></li><li><a class=\"cursor-pointer\" hx-get=\"/logout\">Logout</a></li></ol>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<ol class=\"flex space-x-5\"><li class=\"transform transition-transform ease-in delay-[10ms] hover:translate-y-1\"><a href=\"/\">Home</a></li><li class=\"transform transition-transform ease-in delay-[10ms] hover:translate-y-1\"><a href=\"/about\">About</a></li></ol><ol class=\"flex space-x-5\"><li class=\"transform transition-transform ease-in delay-[10ms] hover:translate-y-1\"><a href=\"/profile\">Profile</a></li><li class=\"cursor-pointer transform transition-transform ease-in delay-[10ms] hover:translate-y-1\"><a hx-get=\"/logout\">Logout</a></li></ol>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -139,7 +139,7 @@ func Layout(contents templ.Component, user_id string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</main><section id=\"toast-container\"></section></div><script>\r\n            document.addEventListener(\"DOMContentLoaded\", function() {\r\n                document.querySelectorAll(\"[data-dismiss-target]\").forEach(function(button) {\r\n                    button.addEventListener(\"click\", function() {\r\n                        var targetId = this.getAttribute(\"data-dismiss-target\");\r\n                        var targetElement = document.querySelector(targetId);\r\n                        if (targetElement) {\r\n                            targetElement.remove();\r\n                        }\r\n                    });\r\n                });\r\n            });\r\n        </script></body><script src=\"/static/toast.js\" defer></script>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</main><section id=\"toast-container\"></section></div><script>\r\n            document.addEventListener(\"DOMContentLoaded\", function() {\r\n                document.querySelectorAll(\"[data-dismiss-target]\").forEach(function(button) {\r\n                    button.addEventListener(\"click\", function() {\r\n                        var targetId = this.getAttribute(\"data-dismiss-target\");\r\n                        var targetElement = document.querySelector(targetId);\r\n                        if (targetElement) {\r\n                            targetElement.remove();\r\n                        }\r\n                    });\r\n                });\r\n            });\r\n\t\t\t// const socket = new WebSocket('ws://localhost:8000/ws');\r\n\r\n        </script></body><script src=\"/static/toast.js\" defer></script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

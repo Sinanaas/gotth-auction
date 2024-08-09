@@ -13,11 +13,11 @@ import (
 )
 
 var (
-	server               *gin.Engine
-	AuthController       controllers.AuthController
-	AuthRouteController  routes.AuthRouterController
-	BasicRouteController routes.BasicRouterController
-	BasicController      controllers.BasicController
+	server                   *gin.Engine
+	AuthController           controllers.AuthController
+	AuthRouteController      routes.AuthRouterController
+	BasicRouteController     routes.BasicRouterController
+	BasicController          controllers.BasicController
 )
 
 func init() {
@@ -45,8 +45,13 @@ func main() {
 
 	initializers.ConnectDB(&config)
 
+	// cors config
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = []string{"http://localhost:8000", config.ClientOrigin}
+	corsConfig.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
+	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	corsConfig.ExposeHeaders = []string{"Content-Length"}
+	corsConfig.AllowWebSockets = true
 	corsConfig.AllowCredentials = true
 
 	// serve static file
@@ -56,9 +61,11 @@ func main() {
 	server.Use(cors.New(corsConfig))
 
 	router := server.Group("/")
+
 	// auth router
 	AuthRouteController.AuthRoute(router)
 	// basic router
 	BasicRouteController.BasicRoute(router)
+
 	log.Fatal(server.Run(":" + config.ServerPort))
 }

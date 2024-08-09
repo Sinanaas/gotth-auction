@@ -74,13 +74,6 @@ func (bc BasicController) UpdateProfile(ctx *gin.Context) {
 		dummy.Email = user.Email
 	}
 
-	if dummy.Username == user.Username && dummy.Email == user.Email {
-		toast := toast.Danger("No changes detected")
-		toast.SetHXTriggerHeader(ctx)
-		ctx.JSON(http.StatusOK, gin.H{"message": "No changes detected"})
-		return
-	} 
-
 	// Handle file upload
 	file, err := ctx.FormFile("profile_image")
 	if err == nil {
@@ -110,4 +103,22 @@ func (bc BasicController) UpdateProfile(ctx *gin.Context) {
 
 	toast := toast.Success("Profile updated successfully")
 	toast.SetHXTriggerHeader(ctx)
+}
+
+func (bc BasicController) GetCategories() []models.Category {
+	var categories []models.Category
+	bc.DB.Find(&categories)
+	return categories
+}
+
+func (bc BasicController) GetAuctions() []models.Auction {
+	var auctions []models.Auction
+	bc.DB.Preload("User").Find(&auctions)
+	return auctions
+}
+
+func (bc BasicController) GetAuction(auction_id string) models.Auction {
+	var auction models.Auction
+	bc.DB.Preload("User").Preload("Category").Where("id = ?", auction_id).First(&auction)
+	return auction
 }

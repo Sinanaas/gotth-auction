@@ -10,23 +10,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type GetHomeHandler struct{}
+type GetAuctionHandler struct{}
 
-func NewGetHomeHandler() *GetHomeHandler {
-	return &GetHomeHandler{}
+func NewGetAuctionHandler() *GetAuctionHandler {
+	return &GetAuctionHandler{}
 }
 
-func (gh *GetHomeHandler) ServeHTTP(ctx *gin.Context) {
+func (ga *GetAuctionHandler) ServeHTTP(ctx *gin.Context) {
+	bc := controllers.NewBasicController(initializers.DB)
+	auction_id := ctx.Param("id")
+	c := templates.Auction(bc.GetAuction(auction_id))
 	session := sessions.Default(ctx)
 	var user_id string
 	v := session.Get("user_id")
 	if v != nil {
 		user_id = v.(string)
 	}
-	bc := controllers.NewBasicController(initializers.DB)
-	c := templates.Home(bc.GetAuctions())
-	err := templates.Layout(c, user_id).Render(ctx.Request.Context(), ctx.Writer)
 
+	err := templates.Layout(c, user_id).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
