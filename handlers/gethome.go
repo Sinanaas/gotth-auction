@@ -23,8 +23,7 @@ func (gh *GetHomeHandler) ServeHTTP(ctx *gin.Context) {
 	if v != nil {
 		user_id = v.(string)
 	}
-	bc := controllers.NewBasicController(initializers.DB)
-	c := templates.Home(bc.GetAuctions())
+	c := templates.Home(controllers.NewBasicController(initializers.DB).GetAuctions())
 	err := templates.Layout(c, user_id).Render(ctx.Request.Context(), ctx.Writer)
 
 	if err != nil {

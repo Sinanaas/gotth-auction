@@ -13,11 +13,13 @@ import (
 )
 
 var (
-	server                   *gin.Engine
-	AuthController           controllers.AuthController
-	AuthRouteController      routes.AuthRouterController
-	BasicRouteController     routes.BasicRouterController
-	BasicController          controllers.BasicController
+	server               *gin.Engine
+	AuthController       controllers.AuthController
+	AuthRouteController  routes.AuthRouterController
+	BasicRouteController routes.BasicRouterController
+	BasicController      controllers.BasicController
+	WebsocketController  controllers.WebsocketController
+	WebsocketRouteController routes.WebsocketRouterController
 )
 
 func init() {
@@ -31,6 +33,8 @@ func init() {
 	AuthRouteController = routes.NewAuthRouterController(AuthController)
 	BasicController = controllers.NewBasicController(initializers.DB)
 	BasicRouteController = routes.NewBasicRouterController(BasicController)
+	WebsocketController = controllers.NewWebsocketController(initializers.DB)
+	WebsocketRouteController = routes.NewWebsocketRouterController(WebsocketController)
 
 	server = gin.Default()
 	store := cookie.NewStore([]byte(config.SessionSecretKey))
@@ -66,6 +70,8 @@ func main() {
 	AuthRouteController.AuthRoute(router)
 	// basic router
 	BasicRouteController.BasicRoute(router)
+	// websocket router
+	WebsocketRouteController.WebsocketRoute(router)
 
 	log.Fatal(server.Run(":" + config.ServerPort))
 }

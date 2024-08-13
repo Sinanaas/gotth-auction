@@ -1,0 +1,11 @@
+<div id="bid_room" hx-swap-oob="beforebegin">
+    <li class="flex flex-col items-center p-4 border-b border-gray-200">
+        <div class="flex w-full justify-between">
+            <div class="text-gray-900 font-semibold">{{ .User.Username }}</div>
+            <div class="text-gray-700">Bid Amount: ${{ printf "%.2f" .BidAmount }}</div>
+        </div>
+        <div class="w-full flex justify-end">
+            <div class="text-gray-400 text-xs">{{ .CreatedAt.Format "2006-01-02 15:04:05" }}</div>
+        </div>
+    </li>   
+</div>

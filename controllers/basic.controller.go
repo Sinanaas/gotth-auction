@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/Sinanaas/gotth-auction/initializers"
@@ -113,12 +114,24 @@ func (bc BasicController) GetCategories() []models.Category {
 
 func (bc BasicController) GetAuctions() []models.Auction {
 	var auctions []models.Auction
-	bc.DB.Preload("User").Find(&auctions)
+	bc.DB.Model(&models.Auction{}).Preload("User").Preload("Category").Find(&auctions)
 	return auctions
 }
 
 func (bc BasicController) GetAuction(auction_id string) models.Auction {
 	var auction models.Auction
-	bc.DB.Preload("User").Preload("Category").Where("id = ?", auction_id).First(&auction)
+	result := bc.DB.Preload("User").Preload("Category").Preload("Bid").Where("id = ?", auction_id).First(&auction)
+	if result.Error != nil {
+		log.Printf("Error fetching auction: %v", result.Error)
+	}
 	return auction
+}
+
+func (bc BasicController) GetBidsForAuction(auctionID string) []models.Bid {
+	var bids []models.Bid
+	result := bc.DB.Preload("User").Where("auction_id = ?", auctionID).Order("bid_time desc").Find(&bids)
+	if result.Error != nil {
+		log.Printf("Error fetching bids: %v", result.Error)
+	}
+	return bids
 }
