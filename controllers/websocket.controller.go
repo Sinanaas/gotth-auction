@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"strconv"
 	"time"
 
-	"github.com/Sinanaas/gotth-auction/initializers"
 	"github.com/Sinanaas/gotth-auction/models"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -29,7 +29,6 @@ var (
 	writeWait            = 10 * time.Second
 	pongWait             = 60 * time.Second
 	pingPeriod           = (pongWait * 9) / 10
-	wc 				 	 = NewWebsocketController(initializers.DB)
 )
 
 var upgrader = websocket.Upgrader{
@@ -66,13 +65,17 @@ func Run(h *models.AuctionHub) {
 			h.Lock()
 			h.Clients[client] = true
 			log.Printf("client %v connected", client.User.ID)
+			for _, message := range h.Messages {
+				client.Send <- GetMessageTemplate(message)
+			}
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client]; ok {
-				delete(h.Clients, client)
 				close(client.Send)
 				log.Printf("client %v disconnected", client.User.ID)
+				delete(h.Clients, client)
 			}
 		case message := <-h.Broadcast:
+			h.RLock()
 			h.Messages = append(h.Messages, message)
 			for client := range h.Clients {
 				select {
@@ -82,6 +85,7 @@ func Run(h *models.AuctionHub) {
 					delete(h.Clients, client)
 				}
 			}
+			h.RUnlock()
 		}
 	}
 }
@@ -94,7 +98,6 @@ func (wc WebsocketController) GetUserBos(userId string) models.User {
 	}
 	return user
 }
-
 
 func (wc WebsocketController) ServeWS(hub *models.AuctionHub, ctx *gin.Context) {
 	fmt.Println("SATU")
@@ -117,7 +120,7 @@ func (wc WebsocketController) ServeWS(hub *models.AuctionHub, ctx *gin.Context) 
 		fmt.Println("DB IS NOT NIL")
 	}
 	tempUser := wc.GetUserBos(user_id)
-	fmt.Println("SERVE USERNAME:", user_id)
+	fmt.Println("SERVE USERNAME:", tempUser.Username)
 	fmt.Println("EMPAT")
 
 	client := &models.UserClient{
@@ -131,18 +134,20 @@ func (wc WebsocketController) ServeWS(hub *models.AuctionHub, ctx *gin.Context) 
 	client.Hub.Register <- client
 	fmt.Println("ENAM")
 
-	go WritePump(client)
+	go wc.WritePump(client)
 	fmt.Println("TUJUH")
 
-	go ReadPump(client)
+	go wc.ReadPump(client)
 	fmt.Println("DELAPAN")
 }
 
-func WritePump(c *models.UserClient) {
+func (wc WebsocketController) WritePump(c *models.UserClient) {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
+		fmt.Println("WRITEPUMP DISCONNECT")
 		c.Conn.Close()
 	}()
+	fmt.Println("WRITEPUMP CONNECT")
 
 	for {
 		select {
@@ -182,36 +187,53 @@ func WritePump(c *models.UserClient) {
 	}
 }
 
-func ReadPump(c *models.UserClient) {
+func (wc WebsocketController) ReadPump(c *models.UserClient) {
 	defer func() {
-		c.Conn.Close()
+		fmt.Println("READPUMP DISCONNECT")
 		c.Hub.Unregister <- c
+		c.Conn.Close()
 	}()
 
-	c.Conn.SetReadLimit(MaxMessageSize)
-	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.Conn.SetPongHandler(func(string) error {
-		c.Conn.SetReadDeadline(time.Now().Add(pongWait))
-		fmt.Println("READPUMP 1")
-		return nil
-	})
+	
+	fmt.Println("READPUMP CONNECT")
 
+    if c.Conn == nil {
+        log.Println("Error: connection is nil")
+        return
+    }
+
+    if c.Hub == nil {
+        log.Println("Error: hub is nil")
+        return
+    }
+    
+    c.Conn.SetReadLimit(MaxMessageSize)
+    c.Conn.SetReadDeadline(time.Now().Add(pongWait))
+    c.Conn.SetPongHandler(func(string) error {
+        c.Conn.SetReadDeadline(time.Now().Add(pongWait))
+        return nil
+    })
+
+	fmt.Println("READPUMP 2")
 	for {
-		fmt.Println("READPUMP 2")
 		_, price, err := c.Conn.ReadMessage()
+		log.Printf("? Error: %v", err)
+		log.Printf("? Value: %v", string(price))
 		fmt.Println("READPUMP 3")
 		if err != nil {
 			fmt.Println("READPUMP 4")
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				fmt.Println("READPUMP 5")
 				log.Printf("error: %v", err)
+				fmt.Println("READPUMP 5")
 			}
 			fmt.Println("READPUMP 6")
 			break
 		}
-		log.Println("Value: %v", string(price))
+		fmt.Println("MASUK USERNAME READPUMP")
+
+		// Correctly call the GetUserBos method of WebsocketController
 		user := wc.GetUserBos(c.User.ID.String())
-		fmt.Println("READPUMP USERNAME", c.User.ID.String())
+		fmt.Println("READPUMP USERNAME", user.Username)
 		fmt.Println("READPUMP 7")
 		now := time.Now()
 
@@ -227,7 +249,8 @@ func ReadPump(c *models.UserClient) {
 			fmt.Println("READPUMP 12")
 			log.Printf("error: %v", err)
 		}
-		c.Hub.Broadcast <- &models.Bid{AuctionID: c.Hub.Auction.ID, Auction: *c.Hub.Auction, UserID: user.ID, User: user, BidAmount: bid.Price, BidTime: now}
+		float_price, _ := strconv.ParseFloat(bid.Price, 64) 
+		c.Hub.Broadcast <- &models.Bid{AuctionID: c.Hub.Auction.ID, Auction: *c.Hub.Auction, UserID: user.ID, User: user, BidAmount: float_price, BidTime: now}
 		fmt.Println("READPUMP 13")
 		result := wc.DB.Create(bid)
 		fmt.Println("READPUMP 14")

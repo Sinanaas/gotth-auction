@@ -40,7 +40,7 @@ templ Auction(auction models.Auction, bidders []models.Bid) {
 			</div>
 			<div class="border-t border-gray-200 pt-6">
 				<h2 class="text-2xl font-bold text-gray-900 mb-4">Place Your Bid</h2>
-				<form id="form" ws-send class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+				<form id="form" ws-send hx-reset-on-success class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
 					<input type="number" name="price" class="border border-gray-300 rounded-lg py-1 px-4 w-full md:w-1/2" placeholder="Enter your bid amount" required min="1" step="1"/>
 					<button type="submit" class="mt-4 md:mt-0 bg-blue-500 text-white rounded-lg py-1 px-4 md:ml-4 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Place Bid</button>
 				</form>

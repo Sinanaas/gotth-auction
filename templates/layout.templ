@@ -10,6 +10,7 @@ templ header() {
 		<link rel="stylesheet" href="/static/app.css"/>
 		<link rel="preconnect" href="https://fonts.gstatic.com"/>
 		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet"/>
+		<script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/ws.js"></script>
 	</head>
 }
 
@@ -75,8 +76,6 @@ templ Layout(contents templ.Component, user_id string) {
                     });
                 });
             });
-			const socket = new WebSocket('ws://localhost:8000/ws');
-
         </script>
     </body>
 	<script src="/static/toast.js" defer></script>

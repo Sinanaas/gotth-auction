@@ -20,6 +20,6 @@ type Bid struct {
 }
 
 type WSBid struct {
-	Price float64 `json:"price"`
+	Price string `json:"price"`
 	Headers interface{} `json:"headers"`
 }
