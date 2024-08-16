@@ -38,7 +38,7 @@ var upgrader = websocket.Upgrader{
 
 func NewAuctionHub() *models.AuctionHub {
 	return &models.AuctionHub{
-		Clients:    make(map[*models.UserClient]bool),
+		Clients:    map[*models.UserClient]bool{},
 		Broadcast:  make(chan *models.Bid),
 		Register:   make(chan *models.UserClient),
 		Unregister: make(chan *models.UserClient),
@@ -46,9 +46,12 @@ func NewAuctionHub() *models.AuctionHub {
 }
 
 func GetMessageTemplate(message *models.Bid) []byte {
+	fmt.Println("GET MESSAGE TEMPLATE")
 	tmpl, err := template.ParseFiles("templates/message.html")
 	if err != nil {
 		log.Println("template parsing:", err)
+	} else {
+		log.Println("template parsing: success")
 	}
 	var renderedMessage bytes.Buffer
 	err = tmpl.Execute(&renderedMessage, message)
@@ -62,19 +65,25 @@ func Run(h *models.AuctionHub) {
 	for {
 		select {
 		case client := <-h.Register:
+			fmt.Println("CLIENT REGISTER")
 			h.Lock()
 			h.Clients[client] = true
+			h.Unlock()
 			log.Printf("client %v connected", client.User.ID)
 			for _, message := range h.Messages {
 				client.Send <- GetMessageTemplate(message)
 			}
 		case client := <-h.Unregister:
+			fmt.Println("CLIENT UNREGISTER")
+			h.Lock()
 			if _, ok := h.Clients[client]; ok {
 				close(client.Send)
 				log.Printf("client %v disconnected", client.User.ID)
 				delete(h.Clients, client)
 			}
+			h.Unlock()
 		case message := <-h.Broadcast:
+			fmt.Println("SENDING MESSAGE")
 			h.RLock()
 			h.Messages = append(h.Messages, message)
 			for client := range h.Clients {
@@ -114,13 +123,7 @@ func (wc WebsocketController) ServeWS(hub *models.AuctionHub, ctx *gin.Context) 
 		user_id = v.(string)
 	}
 	fmt.Println("TIGA")
-	if wc.DB == nil {
-		fmt.Println("DB IS NIL")
-	} else {
-		fmt.Println("DB IS NOT NIL")
-	}
 	tempUser := wc.GetUserBos(user_id)
-	fmt.Println("SERVE USERNAME:", tempUser.Username)
 	fmt.Println("EMPAT")
 
 	client := &models.UserClient{
@@ -144,24 +147,21 @@ func (wc WebsocketController) ServeWS(hub *models.AuctionHub, ctx *gin.Context) 
 func (wc WebsocketController) WritePump(c *models.UserClient) {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
-		fmt.Println("WRITEPUMP DISCONNECT")
+		ticker.Stop()
 		c.Conn.Close()
 	}()
-	fmt.Println("WRITEPUMP CONNECT")
 
 	for {
 		select {
 		case msg, ok := <-c.Send:
-			c.Conn.SetWriteDeadline(time.Now().Add(writeWait * time.Second))
+			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
-				fmt.Println("WRITEPUMP 1")
 				return
 			}
 
 			w, err := c.Conn.NextWriter(websocket.TextMessage)
 			if err != nil {
-				fmt.Println("WRITEPUMP 2")
 				return
 			}
 
@@ -173,14 +173,12 @@ func (wc WebsocketController) WritePump(c *models.UserClient) {
 			}
 
 			if err := w.Close(); err != nil {
-				fmt.Println("WRITEPUMP 3")
 				return
 			}
+
 		case <-ticker.C:
 			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
-			fmt.Println("WRITEPUMP 4")
 			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-				fmt.Println("WRITEPUMP 5")
 				return
 			}
 		}
@@ -193,32 +191,18 @@ func (wc WebsocketController) ReadPump(c *models.UserClient) {
 		c.Hub.Unregister <- c
 		c.Conn.Close()
 	}()
-
-	
 	fmt.Println("READPUMP CONNECT")
 
-    if c.Conn == nil {
-        log.Println("Error: connection is nil")
-        return
-    }
-
-    if c.Hub == nil {
-        log.Println("Error: hub is nil")
-        return
-    }
-    
-    c.Conn.SetReadLimit(MaxMessageSize)
-    c.Conn.SetReadDeadline(time.Now().Add(pongWait))
-    c.Conn.SetPongHandler(func(string) error {
-        c.Conn.SetReadDeadline(time.Now().Add(pongWait))
-        return nil
-    })
+	c.Conn.SetReadLimit(MaxMessageSize)
+	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
+	c.Conn.SetPongHandler(func(string) error {
+		c.Conn.SetReadDeadline(time.Now().Add(pongWait))
+		return nil
+	})
 
 	fmt.Println("READPUMP 2")
 	for {
 		_, price, err := c.Conn.ReadMessage()
-		log.Printf("? Error: %v", err)
-		log.Printf("? Value: %v", string(price))
 		fmt.Println("READPUMP 3")
 		if err != nil {
 			fmt.Println("READPUMP 4")
@@ -226,14 +210,13 @@ func (wc WebsocketController) ReadPump(c *models.UserClient) {
 				log.Printf("error: %v", err)
 				fmt.Println("READPUMP 5")
 			}
+			log.Printf("?? error: %v", err)
 			fmt.Println("READPUMP 6")
 			break
 		}
 		fmt.Println("MASUK USERNAME READPUMP")
 
-		// Correctly call the GetUserBos method of WebsocketController
 		user := wc.GetUserBos(c.User.ID.String())
-		fmt.Println("READPUMP USERNAME", user.Username)
 		fmt.Println("READPUMP 7")
 		now := time.Now()
 
@@ -244,15 +227,17 @@ func (wc WebsocketController) ReadPump(c *models.UserClient) {
 		decoder := json.NewDecoder(reader)
 		fmt.Println("READPUMP 10")
 		err = decoder.Decode(bid)
+		float_price, _ := strconv.ParseFloat(bid.Price, 64)
 		fmt.Println("READPUMP 11")
 		if err != nil {
 			fmt.Println("READPUMP 12")
 			log.Printf("error: %v", err)
 		}
-		float_price, _ := strconv.ParseFloat(bid.Price, 64) 
-		c.Hub.Broadcast <- &models.Bid{AuctionID: c.Hub.Auction.ID, Auction: *c.Hub.Auction, UserID: user.ID, User: user, BidAmount: float_price, BidTime: now}
+		dummy_bid := &models.Bid{AuctionID: c.Hub.Auction.ID, Auction: *c.Hub.Auction, UserID: user.ID, User: user, BidAmount: float_price, BidTime: now}
+		c.Hub.Broadcast <- dummy_bid
 		fmt.Println("READPUMP 13")
-		result := wc.DB.Create(bid)
+		result := wc.DB.Create(dummy_bid)
+		wc.DB.Model(&c.Hub.Auction).Update("CurrentPrice", float_price)
 		fmt.Println("READPUMP 14")
 		if result.Error != nil {
 			fmt.Println("READPUMP 15")

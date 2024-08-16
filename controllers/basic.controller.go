@@ -135,3 +135,7 @@ func (bc BasicController) GetBidsForAuction(auctionID string) []models.Bid {
 	}
 	return bids
 }
+
+func (bc BasicController) UpdatePrice(auction models.Auction, price float64) {
+	bc.DB.Model(&auction).Update("price", price)
+}

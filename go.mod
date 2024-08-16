@@ -9,7 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.6.0
-	github.com/gorilla/websocket v1.5.3
+	github.com/gorilla/websocket v1.5.0
 	github.com/spf13/viper v1.19.0
 	golang.org/x/crypto v0.25.0
 	gorm.io/driver/postgres v1.5.9

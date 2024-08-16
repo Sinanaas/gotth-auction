@@ -20,7 +20,7 @@ templ Message(bidder models.Bid) {
 }
 
 templ Auction(auction models.Auction, bidders []models.Bid) {
-	<div hx-ext="ws" ws-connect="/ws" class="max-w-4xl w-full bg-white rounded-lg shadow-lg overflow-hidden ">
+	<div hx-ext="ws" ws-connect={fmt.Sprintf("/ws/%s", auction.ID)} class="max-w-4xl w-full bg-white rounded-lg shadow-lg overflow-hidden ">
 		<div class="p-6">
 			<h1 class="text-4xl font-extrabold text-gray-900 mb-4">{ auction.Title }</h1>
 			<div class="flex mb-6 gap-8">
@@ -53,7 +53,7 @@ templ Auction(auction models.Auction, bidders []models.Bid) {
 					<p class="text-xl font-semibold text-gray-600 mb-4">Current Price: ${ fmt.Sprintf("%v", auction.CurrentPrice) }</p>
 				</div>
 				if len(bidders) > 0 {
-					<ul id="bid_room" class="space-y-4">
+					<ul id="bid_room" class="space-y-4 max-h-64 overflow-y-auto">
 						for _, bidder := range bidders {
                             @Message(bidder)
 						}
