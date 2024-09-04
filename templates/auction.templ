@@ -3,23 +3,13 @@ package templates
 import (
 	"fmt"
 	"github.com/Sinanaas/gotth-auction/models"
+	"github.com/Sinanaas/gotth-auction/controllers"
+	"github.com/Sinanaas/gotth-auction/initializers"
 )
 
-templ Message(bidder models.Bid) {
-    <div id="bid_room" hx-swap-oob="beforebegin">
-        <li class="flex flex-col items-center p-4 border-b border-gray-200">
-            <div class="flex w-full justify-between">
-                <div class="text-gray-900 font-semibold">{ bidder.User.Username }</div>
-                <div class="text-gray-700">Bid Amount: ${ fmt.Sprintf("%v", bidder.BidAmount) }</div>
-            </div>
-            <div class="w-full flex justify-end">
-                <div class="text-gray-400 text-xs">{ bidder.CreatedAt.Format("2006-01-02 15:04:05") }</div>
-            </div>
-        </li>   
-    </div>
-}
+var basicController = controllers.NewBasicController(initializers.DB)
 
-templ Auction(auction models.Auction, bidders []models.Bid) {
+templ Auction(auction models.Auction) {
 	<div hx-ext="ws" ws-connect={fmt.Sprintf("/ws/%s", auction.ID)} class="max-w-4xl w-full bg-white rounded-lg shadow-lg overflow-hidden ">
 		<div class="p-6">
 			<h1 class="text-4xl font-extrabold text-gray-900 mb-4">{ auction.Title }</h1>
@@ -52,15 +42,11 @@ templ Auction(auction models.Auction, bidders []models.Bid) {
 					<h2 class="text-2xl font-bold text-gray-900 mb-4">Bidders Overview</h2>
 					<p class="text-xl font-semibold text-gray-600 mb-4">Current Price: ${ fmt.Sprintf("%v", auction.CurrentPrice) }</p>
 				</div>
-				if len(bidders) > 0 {
-					<ul id="bid_room" class="space-y-4 max-h-64 overflow-y-auto">
-						for _, bidder := range bidders {
-                            @Message(bidder)
-						}
-					</ul>
-				} else {
-					<p class="text-gray-600 text-center underline">No bids have been placed yet.</p>
-				}
+				<ul id="bid_room" class="space-y-4 max-h-64 overflow-y-auto" hx-swap="afterbegin" hx-swap-oob="afterbegin">
+					if len(basicController.GetBidsForAuction(auction.ID.String())) < 0 {
+						<p>There's no bid</p>
+					}
+				</ul>
 			</div>
 		</div>
 	</div>

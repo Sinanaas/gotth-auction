@@ -20,11 +20,9 @@ func (ga *GetAuctionHandler) ServeHTTP(ctx *gin.Context) {
 	bc := controllers.NewBasicController(initializers.DB)
 	auction_id := ctx.Param("id")
 	
-	// get the auction and all the bids for that auction
 	auction := bc.GetAuction(auction_id)
-	bidders := bc.GetBidsForAuction(auction_id)
 	
-	c := templates.Auction(auction, bidders)
+	c := templates.Auction(auction)
 	session := sessions.Default(ctx)
 	var user_id string
 	v := session.Get("user_id")

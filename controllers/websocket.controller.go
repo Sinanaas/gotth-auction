@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Sinanaas/gotth-auction/initializers"
 	"github.com/Sinanaas/gotth-auction/models"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -46,7 +47,6 @@ func NewAuctionHub() *models.AuctionHub {
 }
 
 func GetMessageTemplate(message *models.Bid) []byte {
-	fmt.Println("GET MESSAGE TEMPLATE")
 	tmpl, err := template.ParseFiles("templates/message.html")
 	if err != nil {
 		log.Println("template parsing:", err)
@@ -62,10 +62,15 @@ func GetMessageTemplate(message *models.Bid) []byte {
 }
 
 func Run(h *models.AuctionHub) {
+	basiController := NewBasicController(initializers.DB)
+	messages := basiController.GetBidsForAuction(h.Auction.ID.String())
+	for i := len(messages) - 1; i >= 0; i-- {
+		h.Messages = append(h.Messages, &messages[i])
+	}
+
 	for {
 		select {
 		case client := <-h.Register:
-			fmt.Println("CLIENT REGISTER")
 			h.Lock()
 			h.Clients[client] = true
 			h.Unlock()
@@ -74,7 +79,6 @@ func Run(h *models.AuctionHub) {
 				client.Send <- GetMessageTemplate(message)
 			}
 		case client := <-h.Unregister:
-			fmt.Println("CLIENT UNREGISTER")
 			h.Lock()
 			if _, ok := h.Clients[client]; ok {
 				close(client.Send)
@@ -83,12 +87,12 @@ func Run(h *models.AuctionHub) {
 			}
 			h.Unlock()
 		case message := <-h.Broadcast:
-			fmt.Println("SENDING MESSAGE")
 			h.RLock()
 			h.Messages = append(h.Messages, message)
 			for client := range h.Clients {
 				select {
 				case client.Send <- GetMessageTemplate(message):
+					log.Printf("message %v", message)
 				default:
 					close(client.Send)
 					delete(h.Clients, client)
@@ -234,9 +238,9 @@ func (wc WebsocketController) ReadPump(c *models.UserClient) {
 			log.Printf("error: %v", err)
 		}
 		dummy_bid := &models.Bid{AuctionID: c.Hub.Auction.ID, Auction: *c.Hub.Auction, UserID: user.ID, User: user, BidAmount: float_price, BidTime: now}
-		c.Hub.Broadcast <- dummy_bid
-		fmt.Println("READPUMP 13")
 		result := wc.DB.Create(dummy_bid)
+		fmt.Println("READPUMP 13")
+		c.Hub.Broadcast <- dummy_bid
 		wc.DB.Model(&c.Hub.Auction).Update("CurrentPrice", float_price)
 		fmt.Println("READPUMP 14")
 		if result.Error != nil {
