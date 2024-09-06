@@ -3,7 +3,6 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"log"
 	"strconv"
@@ -50,13 +49,34 @@ func GetMessageTemplate(message *models.Bid) []byte {
 	tmpl, err := template.ParseFiles("templates/message.html")
 	if err != nil {
 		log.Println("template parsing:", err)
-	} else {
-		log.Println("template parsing: success")
 	}
 	var renderedMessage bytes.Buffer
 	err = tmpl.Execute(&renderedMessage, message)
 	if err != nil {
 		log.Println("template execution: ", err)
+	}
+	return renderedMessage.Bytes()
+}
+
+type PriceData struct {
+	Price string
+}
+
+func GetCurrentPriceTemplate(price float64) []byte {
+	log.Println("Entering GetCurrentPriceTemplate")
+	tmpl, err := template.ParseFiles("templates/price.html")
+	if err != nil {
+		log.Println("template parsing error:", err)
+	}
+
+	data := PriceData{
+		Price: strconv.FormatFloat(price, 'f', -1, 64),
+	}
+
+	var renderedMessage bytes.Buffer
+	err = tmpl.Execute(&renderedMessage, data)
+	if err != nil {
+		log.Println("template execution error:", err)
 	}
 	return renderedMessage.Bytes()
 }
@@ -88,11 +108,13 @@ func Run(h *models.AuctionHub) {
 			h.Unlock()
 		case message := <-h.Broadcast:
 			h.RLock()
+			log.Printf("? clients length: %v", len(h.Clients))
 			h.Messages = append(h.Messages, message)
 			for client := range h.Clients {
 				select {
 				case client.Send <- GetMessageTemplate(message):
-					log.Printf("message %v", message)
+					client.Send <- GetCurrentPriceTemplate(message.BidAmount)
+					log.Printf("user %v got message", client.User.ID)
 				default:
 					close(client.Send)
 					delete(h.Clients, client)
@@ -113,22 +135,18 @@ func (wc WebsocketController) GetUserBos(userId string) models.User {
 }
 
 func (wc WebsocketController) ServeWS(hub *models.AuctionHub, ctx *gin.Context) {
-	fmt.Println("SATU")
 	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		log.Printf("Failed to upgrade WebSocket connection: %v", err)
 		return
 	}
-	fmt.Println("DUA")
 	session := sessions.Default(ctx)
 	var user_id string
 	v := session.Get("user_id")
 	if v != nil {
 		user_id = v.(string)
 	}
-	fmt.Println("TIGA")
 	tempUser := wc.GetUserBos(user_id)
-	fmt.Println("EMPAT")
 
 	client := &models.UserClient{
 		Hub:  hub,
@@ -136,16 +154,10 @@ func (wc WebsocketController) ServeWS(hub *models.AuctionHub, ctx *gin.Context) 
 		User: &tempUser,
 		Send: make(chan []byte, 256),
 	}
-	fmt.Println("LIMA")
-
 	client.Hub.Register <- client
-	fmt.Println("ENAM")
 
 	go wc.WritePump(client)
-	fmt.Println("TUJUH")
-
 	go wc.ReadPump(client)
-	fmt.Println("DELAPAN")
 }
 
 func (wc WebsocketController) WritePump(c *models.UserClient) {
@@ -191,11 +203,9 @@ func (wc WebsocketController) WritePump(c *models.UserClient) {
 
 func (wc WebsocketController) ReadPump(c *models.UserClient) {
 	defer func() {
-		fmt.Println("READPUMP DISCONNECT")
 		c.Hub.Unregister <- c
 		c.Conn.Close()
 	}()
-	fmt.Println("READPUMP CONNECT")
 
 	c.Conn.SetReadLimit(MaxMessageSize)
 	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
@@ -204,47 +214,31 @@ func (wc WebsocketController) ReadPump(c *models.UserClient) {
 		return nil
 	})
 
-	fmt.Println("READPUMP 2")
 	for {
 		_, price, err := c.Conn.ReadMessage()
-		fmt.Println("READPUMP 3")
 		if err != nil {
-			fmt.Println("READPUMP 4")
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
-				fmt.Println("READPUMP 5")
 			}
-			log.Printf("?? error: %v", err)
-			fmt.Println("READPUMP 6")
 			break
 		}
-		fmt.Println("MASUK USERNAME READPUMP")
 
 		user := wc.GetUserBos(c.User.ID.String())
-		fmt.Println("READPUMP 7")
 		now := time.Now()
 
 		bid := &models.WSBid{}
-		fmt.Println("READPUMP 8")
 		reader := bytes.NewReader(price)
-		fmt.Println("READPUMP 9")
 		decoder := json.NewDecoder(reader)
-		fmt.Println("READPUMP 10")
 		err = decoder.Decode(bid)
 		float_price, _ := strconv.ParseFloat(bid.Price, 64)
-		fmt.Println("READPUMP 11")
 		if err != nil {
-			fmt.Println("READPUMP 12")
 			log.Printf("error: %v", err)
 		}
 		dummy_bid := &models.Bid{AuctionID: c.Hub.Auction.ID, Auction: *c.Hub.Auction, UserID: user.ID, User: user, BidAmount: float_price, BidTime: now}
 		result := wc.DB.Create(dummy_bid)
-		fmt.Println("READPUMP 13")
 		c.Hub.Broadcast <- dummy_bid
 		wc.DB.Model(&c.Hub.Auction).Update("CurrentPrice", float_price)
-		fmt.Println("READPUMP 14")
 		if result.Error != nil {
-			fmt.Println("READPUMP 15")
 			log.Println(result.Error)
 		}
 	}

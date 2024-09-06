@@ -3,14 +3,10 @@ package templates
 import (
 	"fmt"
 	"github.com/Sinanaas/gotth-auction/models"
-	"github.com/Sinanaas/gotth-auction/controllers"
-	"github.com/Sinanaas/gotth-auction/initializers"
 )
 
-var basicController = controllers.NewBasicController(initializers.DB)
-
 templ Auction(auction models.Auction) {
-	<div hx-ext="ws" ws-connect={fmt.Sprintf("/ws/%s", auction.ID)} class="max-w-4xl w-full bg-white rounded-lg shadow-lg overflow-hidden ">
+	<div hx-ext="ws,multi-swap" ws-connect={ fmt.Sprintf("/ws/%s", auction.ID) } class="max-w-4xl w-full bg-white rounded-lg shadow-lg overflow-hidden ">
 		<div class="p-6">
 			<h1 class="text-4xl font-extrabold text-gray-900 mb-4">{ auction.Title }</h1>
 			<div class="flex mb-6 gap-8">
@@ -40,13 +36,9 @@ templ Auction(auction models.Auction) {
 			<div class="p-6">
 				<div class="flex items-center justify-between">
 					<h2 class="text-2xl font-bold text-gray-900 mb-4">Bidders Overview</h2>
-					<p class="text-xl font-semibold text-gray-600 mb-4">Current Price: ${ fmt.Sprintf("%v", auction.CurrentPrice) }</p>
+					<p id="currentPrice" hx-swap="outerHTML" hx-swap-oob="outerHTML" class="text-xl font-semibold text-gray-600 mb-4">Current Price: ${ fmt.Sprintf("%v", auction.CurrentPrice) }</p>
 				</div>
-				<ul id="bid_room" class="space-y-4 max-h-64 overflow-y-auto" hx-swap="afterbegin" hx-swap-oob="afterbegin">
-					if len(basicController.GetBidsForAuction(auction.ID.String())) < 0 {
-						<p>There's no bid</p>
-					}
-				</ul>
+				<ul id="bid_room" class="space-y-4 max-h-64 overflow-y-auto" hx-swap="afterbegin" hx-swap-oob="afterbegin"></ul>
 			</div>
 		</div>
 	</div>

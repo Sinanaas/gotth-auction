@@ -129,9 +129,7 @@ func (bc BasicController) GetAuction(auction_id string) models.Auction {
 
 func (bc BasicController) GetBidsForAuction(auctionID string) []models.Bid {
 	var bids []models.Bid
-	log.Println("BEFORE FETCHING BIDS")
 	result := bc.DB.Preload("User").Where("auction_id = ?", auctionID).Order("bid_time desc").Find(&bids)
-	log.Println("AFTER FETCHING BIDS")
 	if result.Error != nil {
 		log.Printf("Error fetching bids: %v", result.Error)
 	}

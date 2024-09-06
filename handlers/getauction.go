@@ -21,7 +21,7 @@ func (ga *GetAuctionHandler) ServeHTTP(ctx *gin.Context) {
 	auction_id := ctx.Param("id")
 	
 	auction := bc.GetAuction(auction_id)
-	
+
 	c := templates.Auction(auction)
 	session := sessions.Default(ctx)
 	var user_id string

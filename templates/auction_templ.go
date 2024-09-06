@@ -10,12 +10,8 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"fmt"
-	"github.com/Sinanaas/gotth-auction/controllers"
-	"github.com/Sinanaas/gotth-auction/initializers"
 	"github.com/Sinanaas/gotth-auction/models"
 )
-
-var basicController = controllers.NewBasicController(initializers.DB)
 
 func Auction(auction models.Auction) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -35,14 +31,14 @@ func Auction(auction models.Auction) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div hx-ext=\"ws\" ws-connect=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div hx-ext=\"ws,multi-swap\" ws-connect=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/ws/%s", auction.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 13, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 9, Col: 75}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -55,7 +51,7 @@ func Auction(auction models.Auction) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(auction.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 15, Col: 73}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 11, Col: 73}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -68,7 +64,7 @@ func Auction(auction models.Auction) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(auction.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 18, Col: 122}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 14, Col: 122}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -81,7 +77,7 @@ func Auction(auction models.Auction) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(auction.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 22, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 18, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -94,7 +90,7 @@ func Auction(auction models.Auction) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%v", auction.StartPrice))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 23, Col: 114}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 19, Col: 114}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -107,7 +103,7 @@ func Auction(auction models.Auction) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(auction.StartTime.Format("2006-01-02 15:04:05"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 26, Col: 100}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 22, Col: 100}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -120,36 +116,26 @@ func Auction(auction models.Auction) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(auction.EndTime.Format("2006-01-02 15:04:05"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 27, Col: 96}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 23, Col: 96}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></div></div></div><div class=\"border-t border-gray-200 pt-6\"><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Place Your Bid</h2><form id=\"form\" ws-send hx-reset-on-success class=\"flex flex-col md:flex-row md:items-center md:justify-between mb-4\"><input type=\"number\" name=\"price\" class=\"border border-gray-300 rounded-lg py-1 px-4 w-full md:w-1/2\" placeholder=\"Enter your bid amount\" required min=\"1\" step=\"1\"> <button type=\"submit\" class=\"mt-4 md:mt-0 bg-blue-500 text-white rounded-lg py-1 px-4 md:ml-4 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500\">Place Bid</button></form></div></div><div class=\"bg-gray-50 border-t border-gray-200\"><div class=\"p-6\"><div class=\"flex items-center justify-between\"><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Bidders Overview</h2><p class=\"text-xl font-semibold text-gray-600 mb-4\">Current Price: $")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></div></div></div><div class=\"border-t border-gray-200 pt-6\"><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Place Your Bid</h2><form id=\"form\" ws-send hx-reset-on-success class=\"flex flex-col md:flex-row md:items-center md:justify-between mb-4\"><input type=\"number\" name=\"price\" class=\"border border-gray-300 rounded-lg py-1 px-4 w-full md:w-1/2\" placeholder=\"Enter your bid amount\" required min=\"1\" step=\"1\"> <button type=\"submit\" class=\"mt-4 md:mt-0 bg-blue-500 text-white rounded-lg py-1 px-4 md:ml-4 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500\">Place Bid</button></form></div></div><div class=\"bg-gray-50 border-t border-gray-200\"><div class=\"p-6\"><div class=\"flex items-center justify-between\"><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Bidders Overview</h2><p id=\"currentPrice\" hx-swap=\"outerHTML\" hx-swap-oob=\"outerHTML\" class=\"text-xl font-semibold text-gray-600 mb-4\">Current Price: $")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%v", auction.CurrentPrice))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 43, Col: 114}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 39, Col: 176}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></div><ul id=\"bid_room\" class=\"space-y-4 max-h-64 overflow-y-auto\" hx-swap=\"afterbegin\" hx-swap-oob=\"afterbegin\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if len(basicController.GetBidsForAuction(auction.ID.String())) < 0 {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p>There's no bid</p>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul></div></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></div><ul id=\"bid_room\" class=\"space-y-4 max-h-64 overflow-y-auto\" hx-swap=\"afterbegin\" hx-swap-oob=\"afterbegin\"></ul></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

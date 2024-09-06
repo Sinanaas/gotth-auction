@@ -31,6 +31,7 @@ type Auction struct {
 
 type AuctionHub struct {
 	sync.RWMutex
+    
 	Clients    map[*UserClient]bool
 	Messages   []*Bid
 	Broadcast  chan *Bid
