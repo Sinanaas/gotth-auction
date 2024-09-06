@@ -30,8 +30,8 @@ templ Auction(auction models.Auction) {
 					<input type="number" name="price" class="border border-gray-300 rounded-lg py-1 px-4 w-full md:w-1/2" placeholder="Enter your bid amount" required min="1" step="1"
 						onkeyup="this.setCustomValidity('')" 
 						hx-on:htmx:validation:validate="
-						if (this.value <= htmx.find('#currentPrice').innerText) { 
-							this.setCustomValidity('Bid amount cannot be less than current price'); 
+						if ('Current Price: $' + this.value <= htmx.find('#currentPrice').textContent) { 
+							this.setCustomValidity('Bid amount can't be higher or equal to current price!!!!!!!!!!!!).textContent); 
 							htmx.find('#form').reportValidity();
 						} else { 
 							this.setCustomValidity('JUAN CARLOS'); 
