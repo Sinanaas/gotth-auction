@@ -122,14 +122,14 @@ func Auction(auction models.Auction) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></div></div></div><div class=\"border-t border-gray-200 pt-6\"><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Place Your Bid</h2><form id=\"form\" ws-send hx-reset-on-success class=\"flex flex-col md:flex-row md:items-center md:justify-between mb-4\"><input type=\"number\" name=\"price\" class=\"border border-gray-300 rounded-lg py-1 px-4 w-full md:w-1/2\" placeholder=\"Enter your bid amount\" required min=\"1\" step=\"1\"> <button type=\"submit\" class=\"mt-4 md:mt-0 bg-blue-500 text-white rounded-lg py-1 px-4 md:ml-4 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500\">Place Bid</button></form></div></div><div class=\"bg-gray-50 border-t border-gray-200\"><div class=\"p-6\"><div class=\"flex items-center justify-between\"><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Bidders Overview</h2><p id=\"currentPrice\" hx-swap=\"outerHTML\" hx-swap-oob=\"outerHTML\" class=\"text-xl font-semibold text-gray-600 mb-4\">Current Price: $")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></div></div></div><div class=\"border-t border-gray-200 pt-6\"><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Place Your Bid</h2><form id=\"form\" ws-send hx-reset-on-success class=\"flex flex-col md:flex-row md:items-center md:justify-between mb-4\"><input type=\"number\" name=\"price\" class=\"border border-gray-300 rounded-lg py-1 px-4 w-full md:w-1/2\" placeholder=\"Enter your bid amount\" required min=\"1\" step=\"1\" onkeyup=\"this.setCustomValidity(&#39;&#39;)\" hx-on:htmx:validation:validate=\"\r\n\t\t\t\t\t\tif (this.value &lt;= htmx.find(&#39;#currentPrice&#39;).innerText) { \r\n\t\t\t\t\t\t\tthis.setCustomValidity(&#39;Bid amount cannot be less than current price&#39;); \r\n\t\t\t\t\t\t\thtmx.find(&#39;#form&#39;).reportValidity();\r\n\t\t\t\t\t\t} else { \r\n\t\t\t\t\t\t\tthis.setCustomValidity(&#39;JUAN CARLOS&#39;); \r\n\t\t\t\t\t\t\thtmx.find(&#39;#form&#39;).reportValidity();\r\n\t\t\t\t\t}\"> <button type=\"submit\" class=\"mt-4 md:mt-0 bg-blue-500 text-white rounded-lg py-1 px-4 md:ml-4 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500\">Place Bid</button></form></div></div><div class=\"bg-gray-50 border-t border-gray-200\"><div class=\"p-6\"><div class=\"flex items-center justify-between\"><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Bidders Overview</h2><p id=\"currentPrice\" hx-swap=\"outerHTML\" hx-swap-oob=\"outerHTML\" class=\"text-xl font-semibold text-gray-600 mb-4\">Current Price: $")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%v", auction.CurrentPrice))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 39, Col: 176}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/auction.templ`, Line: 48, Col: 176}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
