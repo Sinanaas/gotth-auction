@@ -22,6 +22,7 @@ type Auction struct {
     Bids         []Bid       `gorm:"foreignKey:AuctionID"`      
     // Categories relation
     Categories   []*Category `gorm:"many2many:auction_categories;"`
+    Winner       uuid.UUID `gorm:"type:uuid;"`
     PhotoURL     string      `gorm:"type:varchar(255)"`
     StartTime    time.Time
     EndTime      time.Time

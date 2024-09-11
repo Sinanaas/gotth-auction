@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"regexp"
 	"strings"
@@ -220,20 +221,21 @@ func (ac AuthController) SignUp(ctx *gin.Context) {
 
 func (ac *AuthController) RefreshToken(ctx *gin.Context) {
 	message := "could not refresh token"
-
+	log.Println("refreshing token 1")
 	cookie, err := ctx.Cookie("refresh_token")
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"status": "fail", "message": message})
 		return
 	}
-
+	log.Println("refreshing token 2")
 	config, _ := initializers.LoadConfig(".")
-
-	sub, err := utils.ValidateToken(cookie, config.RefreshTokenPrivateKey)
+	log.Println("refreshing token 3")
+	sub, err := utils.ValidateToken(cookie, config.RefreshTokenPublicKey)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"status": "fail", "message": err.Error()})
 		return
 	}
+	log.Println("refreshing token 4")
 
 	var user models.User
 	result := ac.DB.First(&user, "id = ?", fmt.Sprint(sub))
@@ -241,12 +243,13 @@ func (ac *AuthController) RefreshToken(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"status": "fail", "message": "the user belonging to this token no logger exists"})
 		return
 	}
-
+	log.Println("refreshing token 5")
 	access_token, err := utils.CreateToken(config.AccessTokenExpiresIn, user.ID.String(), config.AccessTokenPrivateKey)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
 		return
 	}
+	log.Println("refreshing token 6")
 
 	ctx.SetCookie("access_token", access_token, config.AccessTokenMaxAge*60, "/", "localhost", false, true)
 	ctx.SetCookie("logged_in", "true", config.AccessTokenMaxAge*60, "/", "localhost", false, false)

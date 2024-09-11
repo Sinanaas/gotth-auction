@@ -238,6 +238,7 @@ func (wc WebsocketController) ReadPump(c *models.UserClient) {
 		result := wc.DB.Create(dummy_bid)
 		c.Hub.Broadcast <- dummy_bid
 		wc.DB.Model(&c.Hub.Auction).Update("CurrentPrice", float_price)
+		wc.DB.Model(&c.Hub.Auction).Update("Winner", user.ID)
 		if result.Error != nil {
 			log.Println(result.Error)
 		}

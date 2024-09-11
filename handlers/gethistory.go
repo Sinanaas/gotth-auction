@@ -10,20 +10,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type GetHomeHandler struct{}
+type GetHistoryHandler struct{}
 
-func NewGetHomeHandler() *GetHomeHandler {
-	return &GetHomeHandler{}
+func NewGetHistoryHandler() *GetHistoryHandler {
+	return &GetHistoryHandler{}
 }
 
-func (gh *GetHomeHandler) ServeHTTP(ctx *gin.Context) {
+func (gh *GetHistoryHandler) ServeHTTP(ctx *gin.Context) {
 	session := sessions.Default(ctx)
 	var user_id string
 	v := session.Get("user_id")
 	if v != nil {
 		user_id = v.(string)
 	}
-	c := templates.Home(controllers.NewBasicController(initializers.DB).GetActiveAuctions(), controllers.NewBasicController(initializers.DB).GetPassedAuctions())
+	c := templates.History(controllers.NewBasicController(initializers.DB).GetHistory(user_id))
 	err := templates.Layout(c, user_id).Render(ctx.Request.Context(), ctx.Writer)
 
 	if err != nil {

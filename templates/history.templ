@@ -1,0 +1,21 @@
+package templates
+
+import "github.com/Sinanaas/gotth-auction/models"
+import "fmt"
+
+templ History(auctions []models.Auction) {
+    <div class="-mt-64">
+        <h1 class="text-5xl font-extrabold text-white text-center mb-8 tracking-wide underline drop-shadow-md">Auction History</h1>
+        <ul class="list-none grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            for _, auction := range auctions {
+                <li class="bg-white shadow-md rounded-lg p-4">
+                    <h2 class="text-lg font-semibold text-center mb-2 underline">{ auction.Title }</h2>
+                    <ul class="list-none text-sm">
+                        <li class="mb-1"><strong>Final Price:</strong> { fmt.Sprintf("$%.2f", auction.CurrentPrice) }</li>
+                        <li class="mb-1"><strong>End Date:</strong> { auction.EndTime.Format("Jan 02 2006, 15:04 PM") }</li>
+                    </ul>
+                </li>
+            }
+        </ul>
+    </div>
+}

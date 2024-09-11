@@ -3,6 +3,7 @@ package controllers
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/Sinanaas/gotth-auction/initializers"
 	"github.com/Sinanaas/gotth-auction/models"
@@ -28,6 +29,12 @@ func (bc BasicController) GetUser(userId string) models.User {
 		return models.User{}
 	}
 	return user
+}
+
+func (bc BasicController) GetHistory(userId string) []models.Auction {
+	var auctions []models.Auction
+	bc.DB.Preload("Category").Preload("Auction").Where("winner = ?", userId).Find(&auctions)
+	return auctions
 }
 
 func (bc BasicController) UpdateProfile(ctx *gin.Context) {
@@ -112,9 +119,15 @@ func (bc BasicController) GetCategories() []models.Category {
 	return categories
 }
 
-func (bc BasicController) GetAuctions() []models.Auction {
+func (bc BasicController) GetActiveAuctions() []models.Auction {
 	var auctions []models.Auction
-	bc.DB.Model(&models.Auction{}).Preload("User").Preload("Category").Find(&auctions)
+	bc.DB.Model(&models.Auction{}).Preload("User").Preload("Category").Where("end_time > ?", time.Now()).Find(&auctions)
+	return auctions
+}
+
+func (bc BasicController) GetPassedAuctions() []models.Auction {
+	var auctions []models.Auction
+	bc.DB.Model(&models.Auction{}).Preload("User").Preload("Category").Where("end_time <= ?", time.Now()).Find(&auctions)
 	return auctions
 }
 
