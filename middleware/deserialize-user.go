@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Sinanaas/gotth-auction/controllers"
 	"github.com/Sinanaas/gotth-auction/initializers"
 	"github.com/Sinanaas/gotth-auction/models"
 	"github.com/Sinanaas/gotth-auction/utils"
@@ -39,6 +40,9 @@ func DeserializeUser() gin.HandlerFunc {
 			ctx.Redirect(http.StatusSeeOther, "/login")
 			return
 		}
+		
+		var at = controllers.NewAuthController(initializers.DB)
+		at.RefreshToken(ctx)
 
 		ctx.Set("currentUser", user)
 		ctx.Next()

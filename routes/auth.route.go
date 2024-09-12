@@ -21,4 +21,5 @@ func (ac *AuthRouterController) AuthRoute(rg *gin.RouterGroup) {
 	rg.GET("/register", handlers.NewGetRegisterHandler().ServeHTTP)
 	rg.POST("/register", handlers.NewPostRegisterHandler().ServeHTTP)
 	rg.GET("/logout", middleware.DeserializeUser(), ac.authController.LogoutUser)
+	rg.GET("/refresh", middleware.DeserializeUser(), ac.authController.RefreshToken)
 }
