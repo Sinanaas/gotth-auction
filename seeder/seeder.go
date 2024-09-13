@@ -32,16 +32,16 @@ func main() {
 	}()
 
 	// Create a User
-	hashedPassword, err := utils.HashPassword("password123")
+	hashedPassword, err := utils.HashPassword("habatusauda98")
 	if err != nil {
 		tx.Rollback()
 		log.Fatal("? Could not hash password")
 	}
 	user := models.User{
 		ID:       uuid.New(),
-		Username: "John Does",
+		Username: "sinanaas",
 		Password: hashedPassword,
-		Email:    "john@example.com",
+		Email:    "pudge842@gmail.com",
 	}
 	if err := tx.Create(&user).Error; err != nil {
 		tx.Rollback()
@@ -62,32 +62,49 @@ func main() {
 	// Create an Auction
 	auction := models.Auction{
 		ID:           uuid.New(),
-		Title:        "Laptop Auction",
-		Description:  "Auction for a high-end laptop",
+		Title:        "AUCTION BARU BOS",
+		Description:  "Auction baru bos",
 		StartPrice:   1000.00,
-		CurrentPrice: 1200.00,
+		CurrentPrice: 1000.00,
 		UserID:       user.ID,
 		Categories:   []*models.Category{&category},
 		StartTime:    time.Now(),
-		EndTime:      time.Now().Add(24 * time.Hour),
+		EndTime:      time.Now().Add(96 * time.Hour),
 	}
 	if err := tx.Create(&auction).Error; err != nil {
 		tx.Rollback()
 		log.Fatal("? Could not create auction")
 	}
 
-	// Create a Bid
-	bid := models.Bid{
-		ID:        uuid.New(),
-		AuctionID: auction.ID,
-		UserID:    user.ID,
-		BidAmount: 1300.00,
-		BidTime:   time.Now(),
+	// Create another Auction
+	auction2 := models.Auction{
+		ID:           uuid.New(),
+		Title:        "Second Auction",
+		Description:  "This is the second auction",
+		StartPrice:   2000.00,
+		CurrentPrice: 2000.00,
+		UserID:       user.ID,
+		Categories:   []*models.Category{&category},
+		StartTime:    time.Now(),
+		EndTime:      time.Now().Add(48 * time.Hour),
 	}
-	if err := tx.Create(&bid).Error; err != nil {
+	if err := tx.Create(&auction2).Error; err != nil {
 		tx.Rollback()
-		log.Fatal("? Could not create bid")
+		log.Fatal("? Could not create second auction")
 	}
+
+	// Create a Bid
+	// bid := models.Bid{
+	// 	ID:        uuid.New(),
+	// 	AuctionID: auction.ID,
+	// 	UserID:    user.ID,
+	// 	BidAmount: 1300.00,
+	// 	BidTime:   time.Now(),
+	// }
+	// if err := tx.Create(&bid).Error; err != nil {
+	// 	tx.Rollback()
+	// 	log.Fatal("? Could not create bid")
+	// }
 
 	// Commit the transaction
 	if err := tx.Commit().Error; err != nil {
