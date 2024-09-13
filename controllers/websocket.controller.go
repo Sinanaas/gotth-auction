@@ -82,12 +82,6 @@ func GetCurrentPriceTemplate(price float64) []byte {
 }
 
 func Run(h *models.AuctionHub) {
-	basiController := NewBasicController(initializers.DB)
-	messages := basiController.GetBidsForAuction(h.Auction.ID.String())
-	for i := len(messages) - 1; i >= 0; i-- {
-		h.Messages = append(h.Messages, &messages[i])
-	}
-
 	for {
 		select {
 		case client := <-h.Register:
@@ -95,6 +89,15 @@ func Run(h *models.AuctionHub) {
 			h.Clients[client] = true
 			h.Unlock()
 			log.Printf("client %v connected", client.User.ID)
+
+			if h.Messages == nil {
+				basiController := NewBasicController(initializers.DB)
+				messages := basiController.GetBidsForAuction(h.Auction.ID.String())
+				for i := len(messages) - 1; i >= 0; i-- {
+					h.Messages = append(h.Messages, &messages[i])
+				}
+			}
+
 			for _, message := range h.Messages {
 				client.Send <- GetMessageTemplate(message)
 			}

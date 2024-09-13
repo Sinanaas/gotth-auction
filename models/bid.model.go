@@ -8,7 +8,7 @@ import (
 
 type Bid struct {
     gorm.Model
-    ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
+    ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
     // Auction relation
     AuctionID uuid.UUID `gorm:"type:uuid;not null"`
     Auction   Auction   `gorm:"foreignKey:AuctionID"`  

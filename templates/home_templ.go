@@ -31,12 +31,12 @@ func Home(active_auctions []models.Auction, passed_auctions []models.Auction) te
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-col items-center p-6 w-full\"><div class=\"w-full flex justify-between text-center\"><div class=\"w-full flex flex-col items-center mb-4\"><h1 class=\"text-5xl font-extrabold underline text-white mb-4 tracking-wide drop-shadow-md\">Active Auctions</h1><ul class=\"space-y-6 w-full px-16 flex flex-col gap\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-col items-center p-6 w-full\"><div class=\"w-full md:pt-16 flex justify-between text-center\"><div class=\"w-full flex flex-col items-center mb-4\"><h1 class=\"text-5xl md:text-3xl font-extrabold underline text-white mb-6 tracking-wide drop-shadow-md\">Active Auctions</h1><ul class=\"space-y-6 w-full px-16 flex flex-col gap text-left\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(active_auctions) == 0 {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"text-white text-lg font-light mb-8 tracking-wide\">No active auctions available.</p>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"text-white text-lg font-light mb-8 tracking-wide text-center\">No active auctions available.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -122,12 +122,12 @@ func Home(active_auctions []models.Auction, passed_auctions []models.Auction) te
 				}
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul></div><div class=\"border opacity-50 rounded-xl\"></div><div class=\"w-full flex flex-col items-center mb-4\"><h1 class=\"text-5xl font-extrabold underline text-white mb-4 tracking-wide drop-shadow-md\">Passed Auctions</h1><ul class=\"space-y-6 w-full px-16 flex flex-col gap\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul></div><div class=\"border opacity-50 rounded-xl\"></div><div class=\"w-full flex flex-col items-center mb-4\"><h1 class=\"text-5xl md:text-3xl font-extrabold underline text-white mb-6 tracking-wide drop-shadow-md\">Passed Auctions</h1><ul class=\"space-y-6 w-full px-16 flex flex-col gap text-left\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(passed_auctions) == 0 {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"text-white text-lg font-light mb-8 tracking-wide\">No passed auctions available.</p>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"text-white text-lg font-light mb-8 tracking-wide text-center\">No passed auctions available.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

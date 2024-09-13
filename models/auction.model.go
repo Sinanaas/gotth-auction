@@ -10,7 +10,7 @@ import (
 
 type Auction struct {
     gorm.Model
-    ID           uuid.UUID   `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
+    ID           uuid.UUID   `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
     Title        string      `gorm:"type:varchar(100)"`
     Description  string      `gorm:"type:text"`
     StartPrice   float64     `gorm:"type:decimal(10,2)"`
@@ -32,7 +32,6 @@ type Auction struct {
 
 type AuctionHub struct {
 	sync.RWMutex
-    
 	Clients    map[*UserClient]bool
 	Messages   []*Bid
 	Broadcast  chan *Bid

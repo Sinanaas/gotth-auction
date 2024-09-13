@@ -32,13 +32,14 @@ templ Auction(auction models.Auction) {
 						<input type="number" name="price" disabled class="border border-gray-300 rounded-lg py-1 px-4 w-full md:w-1/2" placeholder="Enter your bid amount" required min="1" step="1"
 							onkeyup="this.setCustomValidity('')" 
 							hx-on:htmx:validation:validate="
-							if ('Current Price: $' + this.value <= htmx.find('#currentPrice').textContent) { 
-								this.setCustomValidity('Bid amount can't be higher or equal to current price!!!!!!!!!!!!).textContent); 
+							if ('Current Price: $' + this.value <= htmx.find('#currentPrice')) { 
+								this.setCustomValidity('Bid amount can't be less or equal to current price!!!!!!!!!!!!).textContent); 
 								htmx.find('#form').reportValidity();
 							} else { 
 								this.setCustomValidity('JUAN CARLOS'); 
 								htmx.find('#form').reportValidity();
-						}">
+							}
+						">
 						<button type="submit" disabled class="mt-4 md:mt-0 bg-blue-200 text-white rounded-lg py-1 px-4 md:ml-4 focus:outline-none focus:ring-2">Place Bid</button>
 					} else {
 						<input type="number" name="price" class="border border-gray-300 rounded-lg py-1 px-4 w-full md:w-1/2" placeholder="Enter your bid amount" required min="1" step="1"
@@ -50,7 +51,8 @@ templ Auction(auction models.Auction) {
 							} else { 
 								this.setCustomValidity('JUAN CARLOS'); 
 								htmx.find('#form').reportValidity();
-						}">
+							}
+						">
 						<button type="submit" class="mt-4 md:mt-0 bg-blue-500 text-white rounded-lg py-1 px-4 md:ml-4 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Place Bid</button>
 					}
 				</form>

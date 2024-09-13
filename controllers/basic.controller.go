@@ -33,7 +33,7 @@ func (bc BasicController) GetUser(userId string) models.User {
 
 func (bc BasicController) GetHistory(userId string) []models.Auction {
 	var auctions []models.Auction
-	bc.DB.Where("winner = ?", userId).Find(&auctions)
+	bc.DB.Where("winner = ? AND end_time < ?", userId, time.Now()).Find(&auctions)
 	return auctions
 }
 
@@ -121,19 +121,19 @@ func (bc BasicController) GetCategories() []models.Category {
 
 func (bc BasicController) GetActiveAuctions() []models.Auction {
 	var auctions []models.Auction
-	bc.DB.Model(&models.Auction{}).Preload("Bids").Where("end_time > ?", time.Now()).Find(&auctions)
+	bc.DB.Model(&models.Auction{}).Preload("Bids").Preload("User").Where("end_time > ?", time.Now()).Find(&auctions)
 	return auctions
 }
 
 func (bc BasicController) GetPassedAuctions() []models.Auction {
 	var auctions []models.Auction
-	bc.DB.Model(&models.Auction{}).Preload("Bids").Where("end_time <= ?", time.Now()).Find(&auctions)
+	bc.DB.Model(&models.Auction{}).Preload("Bids").Preload("User").Where("end_time <= ?", time.Now()).Find(&auctions)
 	return auctions
 }
 
 func (bc BasicController) GetAuction(auction_id string) models.Auction {
 	var auction models.Auction
-	result := bc.DB.Preload("Bids").Where("id = ?", auction_id).First(&auction)
+	result := bc.DB.Model(&models.Auction{}).Preload("Bids").Preload("User").Where("id = ?", auction_id).First(&auction)
 	if result.Error != nil {
 		log.Printf("Error fetching auction: %v", result.Error)
 	}
@@ -142,7 +142,8 @@ func (bc BasicController) GetAuction(auction_id string) models.Auction {
 
 func (bc BasicController) GetBidsForAuction(auctionID string) []models.Bid {
 	var bids []models.Bid
-	result := bc.DB.Where("auction_id = ?", auctionID).Order("bid_time desc").Find(&bids)
+	result := bc.DB.Model(&models.Bid{}).Preload("User").Where("auction_id = ?", auctionID).Order("bid_time desc").Find(&bids)
+	log.Printf("Bids: %v", len(bids))
 	if result.Error != nil {
 		log.Printf("Error fetching bids: %v", result.Error)
 	}

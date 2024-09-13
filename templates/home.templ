@@ -4,12 +4,12 @@ import "github.com/Sinanaas/gotth-auction/models"
 
 templ Home(active_auctions []models.Auction, passed_auctions []models.Auction) {
     <div class="flex flex-col items-center p-6 w-full">
-        <div class="w-full flex justify-between text-center">
+        <div class="w-full md:pt-16 flex justify-between text-center">
             <div class="w-full flex flex-col items-center mb-4">
-                <h1 class="text-5xl font-extrabold underline text-white mb-4 tracking-wide drop-shadow-md">Active Auctions</h1>
-                <ul class="space-y-6 w-full px-16 flex flex-col gap">
+                <h1 class="text-5xl md:text-3xl font-extrabold underline text-white mb-6 tracking-wide drop-shadow-md">Active Auctions</h1>
+                <ul class="space-y-6 w-full px-16 flex flex-col gap text-left">
                     if len(active_auctions) == 0 {
-                        <p class="text-white text-lg font-light mb-8 tracking-wide">No active auctions available.</p>
+                        <p class="text-white text-lg font-light mb-8 tracking-wide text-center">No active auctions available.</p>
                     } else {
                         for _, auction := range active_auctions {
                             <a href={ templ.SafeURL("/auction/" + auction.ID.String()) }>
@@ -38,10 +38,10 @@ templ Home(active_auctions []models.Auction, passed_auctions []models.Auction) {
             </div>
             <div class="border opacity-50 rounded-xl"></div>
             <div class="w-full flex flex-col items-center mb-4">
-                <h1 class="text-5xl font-extrabold underline text-white mb-4 tracking-wide drop-shadow-md">Passed Auctions</h1>
-                <ul class="space-y-6 w-full px-16 flex flex-col gap">
+                <h1 class="text-5xl md:text-3xl font-extrabold underline text-white mb-6 tracking-wide drop-shadow-md">Passed Auctions</h1>
+                <ul class="space-y-6 w-full px-16 flex flex-col gap text-left">
                     if (len(passed_auctions) == 0) {
-                        <p class="text-white text-lg font-light mb-8 tracking-wide">No passed auctions available.</p>
+                        <p class="text-white text-lg font-light mb-8 tracking-wide text-center">No passed auctions available.</p>
                     } else {
                         for _, auction := range passed_auctions {
                             <a href={ templ.SafeURL("/auction/" + auction.ID.String()) }>
