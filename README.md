@@ -112,7 +112,15 @@ REFRESH_TOKEN_MAXAGE=604800
 SESSION_SECRET_KEY=change-me
 ```
 
-### 4. Run migrations and seed data
+### 4. Enable the UUID extension
+
+GORM uses `uuid_generate_v4()` for primary keys, which requires the `uuid-ossp` PostgreSQL extension:
+
+```bash
+psql -U postgres -d gotth-auction -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+```
+
+### 5. Run migrations and seed data
 
 ```bash
 go run migrate/migrate.go
