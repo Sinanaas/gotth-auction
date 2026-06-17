@@ -13,36 +13,35 @@ import (
 
 func DeserializeUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var access_token string
-		cookie, err := ctx.Cookie("access_token")
-		if err != nil {
-			ctx.Redirect(http.StatusSeeOther, "/login")
-			return
-		}
-
-		access_token = cookie
-		if access_token == "" {
-			ctx.Redirect(http.StatusSeeOther, "/login")
-			return
-		}
-
 		config, _ := initializers.LoadConfig(".")
-		sub, err := utils.ValidateToken(access_token, config.AccessTokenPublicKey)
 
-		if err != nil {
+		access_token, err := ctx.Cookie("access_token")
+		if err != nil || access_token == "" {
 			ctx.Redirect(http.StatusSeeOther, "/login")
 			return
+		}
+
+		sub, err := utils.ValidateToken(access_token, config.AccessTokenPublicKey)
+		if err != nil {
+			at := controllers.NewAuthController(initializers.DB)
+			at.RefreshToken(ctx)
+			if ctx.IsAborted() {
+				return
+			}
+
+			access_token, _ = ctx.Cookie("access_token")
+			sub, err = utils.ValidateToken(access_token, config.AccessTokenPublicKey)
+			if err != nil {
+				ctx.Redirect(http.StatusSeeOther, "/login")
+				return
+			}
 		}
 
 		var user models.User
-		result := initializers.DB.First(&user, "id = ?", fmt.Sprint(sub))
-		if result.Error != nil {
+		if result := initializers.DB.First(&user, "id = ?", fmt.Sprint(sub)); result.Error != nil {
 			ctx.Redirect(http.StatusSeeOther, "/login")
 			return
 		}
-		
-		var at = controllers.NewAuthController(initializers.DB)
-		at.RefreshToken(ctx)
 
 		ctx.Set("currentUser", user)
 		ctx.Next()
