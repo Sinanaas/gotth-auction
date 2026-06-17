@@ -89,9 +89,9 @@ func (ac AuthController) Login(ctx *gin.Context) {
 	}
 
 	// Set cookies with appropriate flags
-	ctx.SetCookie("access_token", accessToken, config.AccessTokenMaxAge*60, "/", "localhost", false, true)
-	ctx.SetCookie("refresh_token", refreshToken, config.RefreshTokenMaxAge*60, "/", "localhost", false, true)
-	ctx.SetCookie("logged_in", "true", config.AccessTokenMaxAge*60, "/", "localhost", false, false)
+	ctx.SetCookie("access_token", accessToken, config.AccessTokenMaxAge*60, "/", config.ClientOrigin, true, true)
+	ctx.SetCookie("refresh_token", refreshToken, config.RefreshTokenMaxAge*60, "/", config.ClientOrigin, true, true)
+	ctx.SetCookie("logged_in", "true", config.AccessTokenMaxAge*60, "/", config.ClientOrigin, true, false)
 
 	// session
 	session := sessions.Default(ctx)
@@ -245,14 +245,22 @@ func (ac *AuthController) RefreshToken(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie("access_token", access_token, config.AccessTokenMaxAge*60, "/", "localhost", false, true)
-	ctx.SetCookie("logged_in", "true", config.AccessTokenMaxAge*60, "/", "localhost", false, false)
+	ctx.SetCookie("access_token", access_token, config.AccessTokenMaxAge*60, "/", config.ClientOrigin, true, true)
+	ctx.SetCookie("logged_in", "true", config.AccessTokenMaxAge*60, "/", config.ClientOrigin, true, false)
 }
 
 func (ac *AuthController) LogoutUser(ctx *gin.Context) {
-	ctx.SetCookie("access_token", "", -1, "/", "localhost", false, true)
-	ctx.SetCookie("refresh_token", "", -1, "/", "localhost", false, true)
-	ctx.SetCookie("logged_in", "", -1, "/", "localhost", false, false)
+	config, err := initializers.LoadConfig(".")
+	if err != nil {
+		toast := toast.Danger("Configuration error")
+		toast.SetHXTriggerHeader(ctx)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Configuration error"})
+		return
+	}
+
+	ctx.SetCookie("access_token", "", -1, "/", config.ClientOrigin, true, true)
+	ctx.SetCookie("refresh_token", "", -1, "/", config.ClientOrigin, true, true)
+	ctx.SetCookie("logged_in", "", -1, "/", config.ClientOrigin, true, false)
 
 	session := sessions.Default(ctx)
 	session.Clear()
