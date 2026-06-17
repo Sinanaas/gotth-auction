@@ -13,6 +13,11 @@ import (
 
 // SaveFile saves the uploaded file, deletes the previous file if it exists, and returns the new file URL.
 func SaveFile(ctx *gin.Context, file *multipart.FileHeader, userID string, db *gorm.DB) (string, error) {
+	//  Validate photo file using whitelist
+	if !IsValidPhotoFile(file) {
+		return "", fmt.Errorf("invalid photo file")
+	}
+
 	// Extract the file extension
 	ext := filepath.Ext(file.Filename)
 
@@ -45,4 +50,9 @@ func SaveFile(ctx *gin.Context, file *multipart.FileHeader, userID string, db *g
 
 	// Return the new file URL
 	return newFileName, nil
+}
+
+func IsValidPhotoFile(file *multipart.FileHeader) bool {
+	allowed := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".webp": true}
+	return allowed[filepath.Ext(file.Filename)]
 }
