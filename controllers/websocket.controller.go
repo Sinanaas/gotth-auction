@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"html/template"
 	"log"
+	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -34,6 +36,9 @@ var (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return r.Header.Get("Origin") == os.Getenv("CLIENT_ORIGIN")
+	},
 }
 
 func NewAuctionHub() *models.AuctionHub {
