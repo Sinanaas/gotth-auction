@@ -238,9 +238,20 @@ func (wc WebsocketController) ReadPump(c *models.UserClient) {
 		reader := bytes.NewReader(price)
 		decoder := json.NewDecoder(reader)
 		err = decoder.Decode(bid)
-		float_price, _ := strconv.ParseFloat(bid.Price, 64)
 		if err != nil {
 			log.Printf("error: %v", err)
+			continue
+		}
+
+		float_price, err := strconv.ParseFloat(bid.Price, 64)
+		if err != nil {
+			log.Printf("error: %v", err)
+			continue
+		}
+
+		if float_price <= c.Hub.Auction.CurrentPrice || time.Now().After(c.Hub.Auction.EndTime) {
+			log.Printf("error: bid amount (%f) is not higher than current price (%f) or auction has ended", float_price, c.Hub.Auction.CurrentPrice)
+			continue
 		}
 		dummy_bid := &models.Bid{AuctionID: c.Hub.Auction.ID, Auction: *c.Hub.Auction, UserID: user.ID, User: user, BidAmount: float_price, BidTime: now}
 		result := wc.DB.Create(dummy_bid)
