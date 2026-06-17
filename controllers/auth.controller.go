@@ -69,6 +69,7 @@ func (ac AuthController) Login(ctx *gin.Context) {
 		toast := toast.Danger("Configuration error")
 		toast.SetHXTriggerHeader(ctx)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Configuration error"})
+		return
 	}
 
 	accessToken, err := utils.CreateToken(config.AccessTokenExpiresIn, user.ID.String(), config.AccessTokenPrivateKey)
