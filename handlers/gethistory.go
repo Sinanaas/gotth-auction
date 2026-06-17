@@ -23,6 +23,10 @@ func (gh *GetHistoryHandler) ServeHTTP(ctx *gin.Context) {
 	if v != nil {
 		user_id = v.(string)
 	}
+	if user_id == "" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
 	c := templates.History(controllers.NewBasicController(initializers.DB).GetHistory(user_id))
 	err := templates.Layout(c, user_id).Render(ctx.Request.Context(), ctx.Writer)
 
