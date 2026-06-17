@@ -25,7 +25,6 @@ func (wc *WebsocketRouterController) WebsocketRoute(rg *gin.RouterGroup) {
 		auction := controllers.NewBasicController(initializers.DB).GetAuction(auction_id)
 		for _, h := range autionHub {
 			if h.Auction.ID == auction.ID {
-				go controllers.Run(h)
 				wc.websocketController.ServeWS(h, ctx)
 				return
 			}
