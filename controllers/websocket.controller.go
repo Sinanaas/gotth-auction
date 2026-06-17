@@ -115,7 +115,7 @@ func Run(h *models.AuctionHub) {
 			}
 			h.Unlock()
 		case message := <-h.Broadcast:
-			h.RLock()
+			h.Lock()
 			log.Printf("? clients length: %v", len(h.Clients))
 			h.Messages = append(h.Messages, message)
 			for client := range h.Clients {
@@ -128,7 +128,7 @@ func Run(h *models.AuctionHub) {
 					delete(h.Clients, client)
 				}
 			}
-			h.RUnlock()
+			h.Unlock()
 		}
 	}
 }
