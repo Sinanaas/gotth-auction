@@ -193,7 +193,8 @@ func (wc WebsocketController) WritePump(c *models.UserClient) {
 
 			n := len(c.Send)
 			for i := 0; i < n; i++ {
-				w.Write(msg)
+				next := <-c.Send
+				w.Write(next)
 			}
 
 			if err := w.Close(); err != nil {
