@@ -28,7 +28,7 @@ gotth-auction/
 ├── controllers/              # Business logic: auth, auctions, WebSocket
 ├── handlers/                 # HTTP handlers: parse request → call controller → render template
 ├── routes/                   # Route groups and middleware assignment
-├── middleware/               # JWT validation + silent token refresh
+├── middleware/               # JWT validation, silent token refresh, rate limiting
 ├── templates/                # Templ components (compiled to *_templ.go)
 ├── utils/                    # JWT helpers (RS256), bcrypt, file upload
 ├── migrate/                  # GORM AutoMigrate
@@ -127,7 +127,7 @@ go run migrate/migrate.go
 go run seeder/seeder.go   # optional — loads sample auctions and a test user
 ```
 
-### 5. Start the server
+### 6. Start the server
 
 ```bash
 go run main.go
@@ -168,3 +168,4 @@ For hot-reloading during development, install [Air](https://github.com/air-verse
 | Frontend interactivity | HTMX |
 | Styling | Tailwind CSS |
 | Config | Viper |
+| Rate limiting | ulule/limiter |
