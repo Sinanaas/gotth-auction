@@ -37,7 +37,7 @@ func SaveFile(ctx *gin.Context, file *multipart.FileHeader, userID string, db *g
 	if user.PhotoURL != "" {
 		oldFilePath := filepath.Join("uploads", user.PhotoURL)
 		if oldFilePath != filePath {
-			if err := os.Remove(oldFilePath); err != nil {
+			if err := os.Remove(oldFilePath); err != nil && !os.IsNotExist(err) {
 				return "", err
 			}
 		}
