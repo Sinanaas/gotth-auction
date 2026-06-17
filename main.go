@@ -13,12 +13,12 @@ import (
 )
 
 var (
-	server               *gin.Engine
-	AuthController       controllers.AuthController
-	AuthRouteController  routes.AuthRouterController
-	BasicRouteController routes.BasicRouterController
-	BasicController      controllers.BasicController
-	WebsocketController  controllers.WebsocketController
+	server                   *gin.Engine
+	AuthController           controllers.AuthController
+	AuthRouteController      routes.AuthRouterController
+	BasicRouteController     routes.BasicRouterController
+	BasicController          controllers.BasicController
+	WebsocketController      controllers.WebsocketController
 	WebsocketRouteController routes.WebsocketRouterController
 )
 
