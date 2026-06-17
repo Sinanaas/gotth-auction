@@ -11,10 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func DeserializeUser() gin.HandlerFunc {
+func DeserializeUser(config initializers.Config) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		config, _ := initializers.LoadConfig(".")
-
 		access_token, err := ctx.Cookie("access_token")
 		if err != nil || access_token == "" {
 			ctx.Redirect(http.StatusSeeOther, "/login")

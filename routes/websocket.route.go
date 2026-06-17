@@ -17,10 +17,10 @@ func NewWebsocketRouterController(WebsocketController controllers.WebsocketContr
 	return WebsocketRouterController{WebsocketController}
 }
 
-func (wc *WebsocketRouterController) WebsocketRoute(rg *gin.RouterGroup) {
+func (wc *WebsocketRouterController) WebsocketRoute(rg *gin.RouterGroup, config initializers.Config) {
 	var autionHub []*models.AuctionHub
 	
-	rg.GET("/ws/:id", middleware.DeserializeUser(), func(ctx *gin.Context) {
+	rg.GET("/ws/:id", middleware.DeserializeUser(config), func(ctx *gin.Context) {
 		auction_id := ctx.Param("id")
 		auction := controllers.NewBasicController(initializers.DB).GetAuction(auction_id)
 		for _, h := range autionHub {

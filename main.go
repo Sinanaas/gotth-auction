@@ -65,11 +65,11 @@ func main() {
 	router := server.Group("/")
 
 	// auth router
-	AuthRouteController.AuthRoute(router)
+	AuthRouteController.AuthRoute(router, config)
 	// basic router
-	BasicRouteController.BasicRoute(router)
+	BasicRouteController.BasicRoute(router, config)
 	// websocket router
-	WebsocketRouteController.WebsocketRoute(router)
+	WebsocketRouteController.WebsocketRoute(router, config)
 
 	log.Fatal(server.Run(":" + config.ServerPort))
 }
